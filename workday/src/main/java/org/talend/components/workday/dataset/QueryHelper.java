@@ -18,15 +18,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import org.talend.components.workday.WorkdayException;
+import org.talend.components.workday.datastore.WorkdayDataStore;
 
 /**
  * Help to build queries.
  */
 public interface QueryHelper {
 
-    String getServiceToCall();
+    String getServiceToCall(WorkdayDataStore datastore);
 
-    Map<String, String> extractQueryParam();
+    Map<String, String> extractQueryParam(WorkdayDataStore ds);
 
     default String encodeString(final String raw) {
         try {

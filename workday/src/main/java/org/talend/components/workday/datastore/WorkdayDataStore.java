@@ -12,63 +12,61 @@
  */
 package org.talend.components.workday.datastore;
 
-import lombok.Data;
+import java.io.Serializable;
+
 import org.talend.components.workday.service.UIActionService;
+import org.talend.sdk.component.api.component.Version;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.configuration.action.Checkable;
-import org.talend.sdk.component.api.configuration.action.Validable;
+import org.talend.sdk.component.api.configuration.condition.ActiveIf;
+import org.talend.sdk.component.api.configuration.constraint.Required;
 import org.talend.sdk.component.api.configuration.type.DataStore;
+import org.talend.sdk.component.api.configuration.ui.DefaultValue;
 import org.talend.sdk.component.api.configuration.ui.layout.GridLayout;
-import org.talend.sdk.component.api.configuration.ui.widget.Credential;
 import org.talend.sdk.component.api.meta.Documentation;
 
-import java.io.Serializable;
-import java.nio.charset.Charset;
-import java.util.Base64;
+import lombok.Data;
 
 @Data
-@DataStore(WorkdayDataStore.NAME)
+@Version(value = 2)
+@DataStore("WorkdayDataStore")
 @GridLayout({ //
         @GridLayout.Row({ "clientId", "clientSecret" }), //
         @GridLayout.Row({ "tenantAlias" }) //
 })
 @GridLayout(names = GridLayout.FormType.ADVANCED, value = { @GridLayout.Row("authEndpoint"), @GridLayout.Row("endpoint") })
 @Checkable(UIActionService.HEALTH_CHECK)
-@Documentation(WorkdayDataStore.NAME)
+@Documentation("DataStore for workday connector")
 public class WorkdayDataStore implements Serializable {
 
     private static final long serialVersionUID = -8628647674176772061L;
 
-    public static final String NAME = "WorkdayDataStore";
+    public enum AuthenticationType {
+        ClientId, Login;
+    }
 
     @Option
-    @Validable(UIActionService.VALIDATION_URL_PROPERTY)
-    @Documentation("Workday token Auth Endpoint (host only, ie: https://auth.api.workday.com/v1/token)")
-    private String authEndpoint = "https://auth.api.workday.com";
+    @Documentation("Authentication mode (Login only for RAAS)")
+    @DefaultValue("ClientId")
+    @Required
+    private AuthenticationType authentication = AuthenticationType.ClientId;
 
     @Option
     @Documentation("Workday Client Id")
-    private String clientId;
+    @ActiveIf(target = "authentication", value = "ClientId")
+    private ClientIdForm clientIdForm = new ClientIdForm();
 
     @Option
-    @Credential
-    @Documentation("Workday Client Secret")
-    private String clientSecret;
+    @Documentation("Workday Login connection")
+    @ActiveIf(target = "authentication", value = "Login")
+    private UserFormForReport loginForm = new UserFormForReport();
 
-    @Option
-    @Documentation("Workday endpoint for REST services")
-    private String endpoint = "https://api.workday.com";
-
-    @Option
-    @Documentation("Workday tenant alias")
-    private String tenantAlias;
-
-    private transient Token token = null;
-
-    public String getAuthorizationHeader() {
-        final String idSecret = this.clientId + ':' + this.clientSecret;
-        final String idForHeader = Base64.getEncoder().encodeToString(idSecret.getBytes(Charset.defaultCharset()));
-        return "Basic " + idForHeader;
+    public String getEndPoint() {
+        if (this.authentication == AuthenticationType.ClientId) {
+            return this.getClientIdForm().getEndpoint();
+        }
+        else {
+            return this.getLoginForm().getRealEndpoint();
+        }
     }
-
 }

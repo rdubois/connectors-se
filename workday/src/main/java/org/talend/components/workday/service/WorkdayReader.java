@@ -12,10 +12,16 @@
  */
 package org.talend.components.workday.service;
 
-import org.talend.sdk.component.api.service.http.*;
+import java.util.Map;
 
 import javax.json.JsonObject;
-import java.util.Map;
+
+import org.talend.sdk.component.api.service.http.Header;
+import org.talend.sdk.component.api.service.http.HttpClient;
+import org.talend.sdk.component.api.service.http.Path;
+import org.talend.sdk.component.api.service.http.QueryParams;
+import org.talend.sdk.component.api.service.http.Request;
+import org.talend.sdk.component.api.service.http.Response;
 
 /**
  * Service data getter from workday.
@@ -31,6 +37,7 @@ public interface WorkdayReader extends HttpClient {
      * @return response of workday call
      */
     @Request(path = "/{service}", method = "GET")
-    Response<JsonObject> search(@Header("Authorization") String token, @Path("service") String servicePath,
-            @QueryParams(encode = false) Map<String, String> othersParam);
+    Response<JsonObject> search(@Header("Authorization") String token,
+                                @Path("service") String servicePath,
+                                @QueryParams(encode = false) Map<String, String> othersParam);
 }

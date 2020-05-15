@@ -12,20 +12,23 @@
  */
 package org.talend.components.workday.service;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+
 import org.talend.components.workday.WorkdayException;
 import org.talend.components.workday.dataset.QueryHelper;
 import org.talend.components.workday.datastore.Token;
 import org.talend.components.workday.datastore.WorkdayDataStore;
+import org.talend.components.workday.datastore.WorkdayDataStore.AuthenticationType;
 import org.talend.sdk.component.api.component.Version;
 import org.talend.sdk.component.api.service.Service;
 import org.talend.sdk.component.api.service.http.Response;
 
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Version(1)
@@ -39,15 +42,15 @@ public class WorkdayReaderService {
     private AccessTokenService accessToken;
 
     public JsonObject find(WorkdayDataStore datastore, QueryHelper helper, Map<String, String> queryParams) {
-        final Token token = accessToken.findToken(datastore);
-        final String authorizeHeader = token.getAuthorizationHeaderValue();
+        final String authorizeHeader =  this.findAuthorizationHeader(datastore);
 
-        this.reader.base(datastore.getEndpoint());
+        final String endPoint = datastore.getEndPoint();
+        this.reader.base(endPoint);
 
-        final String serviceToCall = helper.getServiceToCall();
+        final String serviceToCall = helper.getServiceToCall(datastore);
         log.debug("calling service {}", serviceToCall);
 
-        Response<JsonObject> result = reader.search(authorizeHeader, serviceToCall, queryParams);
+        final Response<JsonObject> result = reader.search(authorizeHeader, serviceToCall, queryParams);
 
         if (result.status() / 100 != 2) {
             String errorLib = result.error(String.class);
@@ -55,6 +58,14 @@ public class WorkdayReaderService {
             throw new WorkdayException(errorLib);
         }
         return result.body();
+    }
+
+    private String findAuthorizationHeader(WorkdayDataStore datastore) {
+        if (datastore.getAuthentication() == AuthenticationType.Login) {
+            return datastore.getLoginForm().getAuthorizationHeader(); // authorization via login
+        }
+        final Token token = accessToken.findToken(datastore); // authorization via Token
+        return token.getAuthorizationHeaderValue();
     }
 
     public Iterator<JsonObject> extractIterator(JsonObject result, String arrayName) {

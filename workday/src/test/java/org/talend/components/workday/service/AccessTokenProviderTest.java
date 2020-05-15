@@ -57,7 +57,7 @@ class AccessTokenProviderTest extends WorkdayBaseTest {
         AccessTokenProvider provider = factory.create(AccessTokenProvider.class, WorkdayBaseTest.defaultAuthenticationURL);
 
         WorkdayDataStore wds = this.buildDataStore();
-        wds.setClientSecret("fautSecret");
+        wds.getClientIdForm().setClientSecret("fautSecret");
 
         Assertions.assertThrows(WorkdayException.class, () -> provider.getAccessToken(wds));
     }

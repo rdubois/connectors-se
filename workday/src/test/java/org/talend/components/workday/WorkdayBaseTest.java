@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.Properties;
 
+import org.talend.components.workday.datastore.ClientIdForm;
 import org.talend.components.workday.datastore.WorkdayDataStore;
 import org.talend.sdk.component.api.DecryptedServer;
 import org.talend.sdk.component.junit5.WithMavenServers;
@@ -51,14 +52,15 @@ public class WorkdayBaseTest {
     protected WorkdayDataStore buildDataStore() {
         Properties props = this.workdayProps();
         WorkdayDataStore wds = new WorkdayDataStore();
-        wds.setClientId(serverWorkday.getUsername());
-        wds.setClientSecret(serverWorkday.getPassword());
+        final ClientIdForm form = wds.getClientIdForm();
+        form.setClientId(serverWorkday.getUsername());
+        form.setClientSecret(serverWorkday.getPassword());
 
         // tenant
-        wds.setTenantAlias(serverWorkdayTenant.getUsername());
+        form.setTenantAlias(serverWorkdayTenant.getUsername());
 
-        wds.setAuthEndpoint(props.getProperty("authendpoint"));
-        wds.setEndpoint(props.getProperty("endpoint"));
+        form.setAuthEndpoint(props.getProperty("authendpoint"));
+        form.setEndpoint(props.getProperty("endpoint"));
         return wds;
     }
 }

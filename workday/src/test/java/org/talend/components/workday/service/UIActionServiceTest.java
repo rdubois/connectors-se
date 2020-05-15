@@ -46,7 +46,7 @@ class UIActionServiceTest extends WorkdayBaseTest {
     @Test
     void validateConnectionKO() throws NoSuchFieldException, IllegalAccessException {
         final WorkdayDataStore wds = this.buildDataStore();
-        wds.setClientSecret("FAUX");
+        wds.getClientIdForm().setClientSecret("FAUX");
         final UIActionService service = buildService();
         final HealthCheckStatus healthCheckStatusKO = service.validateConnection(wds);
         Assertions.assertNotNull(healthCheckStatusKO);

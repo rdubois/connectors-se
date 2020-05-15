@@ -20,15 +20,17 @@ import java.io.ObjectOutputStream;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.talend.components.workday.datastore.WorkdayDataStore;
 
 class RAASLayoutTest {
 
     @Test
     void getServiceToCall() {
+        final WorkdayDataStore ds = new WorkdayDataStore();
         RAASLayout layout = new RAASLayout();
         layout.setUser("myuser");
         layout.setReport("myreport");
-        Assertions.assertEquals("raas/myuser/myreport", layout.getServiceToCall());
+        Assertions.assertEquals("raas/myuser/myreport", layout.getServiceToCall(ds));
     }
 
     @Test

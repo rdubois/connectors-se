@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
+import org.talend.components.workday.datastore.WorkdayDataStore;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.configuration.ui.layout.GridLayout;
 import org.talend.sdk.component.api.configuration.ui.widget.Code;
@@ -38,12 +39,12 @@ public class WQLLayout implements Serializable, QueryHelper {
     private String query;
 
     @Override
-    public String getServiceToCall() {
+    public String getServiceToCall(WorkdayDataStore ds) {
         return "wql/v1/data";
     }
 
     @Override
-    public Map<String, String> extractQueryParam() {
+    public Map<String, String> extractQueryParam(WorkdayDataStore ds) {
         final String encodedQuery = this.encodeString(this.query);
         return Collections.singletonMap("query", encodedQuery);
     }

@@ -19,6 +19,12 @@
     </properties>
 
     <dependencies>
+        <!-- common -->
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- Testing -->
         <dependency>
             <groupId>org.hamcrest</groupId>
@@ -47,6 +53,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire.version}</version>
                 <configuration>
+
                     <systemPropertyVariables>
                         <!--<talend.junit.http.capture>true</talend.junit.http.capture>-->
                         <talend.junit.http.passthrough>${talend.junit.http.passthrough}</talend.junit.http.passthrough>

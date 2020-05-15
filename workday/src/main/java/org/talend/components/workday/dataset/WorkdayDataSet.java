@@ -12,8 +12,10 @@
  */
 package org.talend.components.workday.dataset;
 
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Map;
+
 import org.talend.components.workday.datastore.WorkdayDataStore;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.configuration.condition.ActiveIf;
@@ -21,9 +23,8 @@ import org.talend.sdk.component.api.configuration.type.DataSet;
 import org.talend.sdk.component.api.configuration.ui.layout.GridLayout;
 import org.talend.sdk.component.api.meta.Documentation;
 
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.Map;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 @Data
 @DataSet("WorkdayDataSet")
@@ -65,26 +66,26 @@ public class WorkdayDataSet implements Serializable, QueryHelper {
     private WQLLayout wql;
 
     @Override
-    public String getServiceToCall() {
-        final QueryHelper helper = this.selectedHelper();
+    public String getServiceToCall(WorkdayDataStore ds) {
+        final QueryHelper helper = this.selectedHelper(ds);
         if (helper == null) {
             log.warn("No service to call for mode {}", this.mode);
             return "";
         }
-        return helper.getServiceToCall();
+        return helper.getServiceToCall(ds);
     }
 
     @Override
-    public Map<String, String> extractQueryParam() {
-        final QueryHelper helper = this.selectedHelper();
+    public Map<String, String> extractQueryParam(WorkdayDataStore ds) {
+        final QueryHelper helper = this.selectedHelper(ds);
         if (helper == null) {
             log.warn("No query param for mode {}", this.mode);
             return Collections.emptyMap();
         }
-        return helper.extractQueryParam();
+        return helper.extractQueryParam(ds);
     }
 
-    private QueryHelper selectedHelper() {
+    private QueryHelper selectedHelper(WorkdayDataStore ds) {
         if (this.mode == WorkdayMode.RAAS) {
             return this.raas;
         }

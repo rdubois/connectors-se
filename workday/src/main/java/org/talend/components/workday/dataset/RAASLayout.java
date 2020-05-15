@@ -14,8 +14,11 @@ package org.talend.components.workday.dataset;
 
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
+import org.talend.components.workday.datastore.WorkdayDataStore;
+import org.talend.components.workday.datastore.WorkdayDataStore.AuthenticationType;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.configuration.ui.layout.GridLayout;
 import org.talend.sdk.component.api.meta.Documentation;
@@ -28,6 +31,12 @@ public class RAASLayout implements Serializable, QueryHelper {
 
     private static final long serialVersionUID = 4748412283124079266L;
 
+    private static final Map<String, String> jsonParam = new HashMap<>(1);
+
+    static {
+        RAASLayout.jsonParam.put("format", "json");
+    }
+
     @Option
     @Documentation("The user who made the report")
     private String user;
@@ -37,13 +46,24 @@ public class RAASLayout implements Serializable, QueryHelper {
     private String report;
 
     @Override
-    public String getServiceToCall() {
+    public String getServiceToCall(WorkdayDataStore ds) {
         final String workdayReportName = this.report.replace(' ', '_'); // workday translate space to underscore.
-        return String.format("raas/%s/%s", this.encodeString(this.user), this.encodeString(workdayReportName));
+        final String sp = this.getServicePattern(ds.getAuthentication());
+        return String.format(sp, this.encodeString(this.user), this.encodeString(workdayReportName));
     }
 
     @Override
-    public Map<String, String> extractQueryParam() {
+    public Map<String, String> extractQueryParam(WorkdayDataStore ds) {
+        if (ds.getAuthentication() == AuthenticationType.Login) {
+            return RAASLayout.jsonParam;
+        }
         return Collections.emptyMap();
+    }
+
+    private String getServicePattern(WorkdayDataStore.AuthenticationType authType) {
+        if (authType ==  WorkdayDataStore.AuthenticationType.Login) {
+            return "%s/%s";
+        }
+        return "raas/%s/%s";
     }
 }

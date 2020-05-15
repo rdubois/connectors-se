@@ -12,7 +12,13 @@
  */
 package org.talend.components.workday.input;
 
+import java.io.Serializable;
+import java.util.Iterator;
+
+import javax.json.JsonObject;
+
 import org.talend.components.workday.dataset.WorkdayDataSet;
+import org.talend.components.workday.datastore.WorkdayDataStore;
 import org.talend.components.workday.service.WorkdayReaderService;
 import org.talend.sdk.component.api.component.Icon;
 import org.talend.sdk.component.api.component.Version;
@@ -20,10 +26,6 @@ import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.input.Emitter;
 import org.talend.sdk.component.api.input.Producer;
 import org.talend.sdk.component.api.meta.Documentation;
-
-import javax.json.JsonObject;
-import java.io.Serializable;
-import java.util.Iterator;
 
 @Version(1)
 @Icon(value = Icon.IconType.CUSTOM, custom = "WorkdayInput")
@@ -48,7 +50,8 @@ public class WorkdayProducer implements Serializable {
     public JsonObject next() {
         if (this.jsonIterator == null) {
             final WorkdayDataSet workdayds = this.config.getDataSet();
-            JsonObject obj = reader.find(workdayds.getDatastore(), workdayds, workdayds.extractQueryParam());
+            final WorkdayDataStore datastore = workdayds.getDatastore();
+            final JsonObject obj = reader.find(datastore, workdayds, workdayds.extractQueryParam(datastore));
             this.jsonIterator = reader.extractIterator(obj, workdayds.getMode().arrayName);
         }
         if (this.jsonIterator == null || !this.jsonIterator.hasNext()) {

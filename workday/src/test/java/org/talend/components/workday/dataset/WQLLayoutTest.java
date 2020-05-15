@@ -21,17 +21,19 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.talend.components.workday.datastore.WorkdayDataStore;
 
 class WQLLayoutTest {
 
     @Test
     void getServiceToCall() {
-        WQLLayout layout = new WQLLayout();
+        final WQLLayout layout = new WQLLayout();
+        final WorkdayDataStore ds = new WorkdayDataStore();
         layout.setQuery("SELECT xx FROM zz");
 
-        Assertions.assertEquals("wql/v1/data", layout.getServiceToCall());
+        Assertions.assertEquals("wql/v1/data", layout.getServiceToCall(ds));
 
-        Map<String, String> params = layout.extractQueryParam();
+        Map<String, String> params = layout.extractQueryParam(ds);
         Assertions.assertNotNull(params);
         Assertions.assertEquals(1, params.size());
         String param = params.get("query");
