@@ -61,7 +61,7 @@ public class WorkdayReaderService {
     }
 
     private String findAuthorizationHeader(WorkdayDataStore datastore) {
-        if (datastore.getAuthentication() == AuthenticationType.Login) {
+        if (datastore.getAuthentication() == AuthenticationType.LOGIN) {
             return datastore.getLoginForm().getAuthorizationHeader(); // authorization via login
         }
         final Token token = accessToken.findToken(datastore); // authorization via Token

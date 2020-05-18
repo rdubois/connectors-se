@@ -54,14 +54,14 @@ public class RAASLayout implements Serializable, QueryHelper {
 
     @Override
     public Map<String, String> extractQueryParam(WorkdayDataStore ds) {
-        if (ds.getAuthentication() == AuthenticationType.Login) {
+        if (ds.getAuthentication() == AuthenticationType.LOGIN) {
             return RAASLayout.jsonParam;
         }
         return Collections.emptyMap();
     }
 
     private String getServicePattern(WorkdayDataStore.AuthenticationType authType) {
-        if (authType == WorkdayDataStore.AuthenticationType.Login) {
+        if (authType == WorkdayDataStore.AuthenticationType.LOGIN) {
             return "%s/%s";
         }
         return "raas/%s/%s";

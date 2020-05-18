@@ -43,28 +43,28 @@ public class WorkdayDataStore implements Serializable {
     private static final long serialVersionUID = -8628647674176772061L;
 
     public enum AuthenticationType {
-        ClientId,
-        Login;
+        CLIENT_ID,
+        LOGIN;
     }
 
     @Option
     @Documentation("Authentication mode (Login only for RAAS)")
-    @DefaultValue("ClientId")
+    @DefaultValue("CLIENT_ID")
     @Required
-    private AuthenticationType authentication = AuthenticationType.ClientId;
+    private AuthenticationType authentication = AuthenticationType.CLIENT_ID;
 
     @Option
     @Documentation("Workday Client Id")
-    @ActiveIf(target = "authentication", value = "ClientId")
+    @ActiveIf(target = "authentication", value = "CLIENT_ID")
     private ClientIdForm clientIdForm = new ClientIdForm();
 
     @Option
     @Documentation("Workday Login connection")
-    @ActiveIf(target = "authentication", value = "Login")
+    @ActiveIf(target = "authentication", value = "LOGIN")
     private UserFormForReport loginForm = new UserFormForReport();
 
     public String getEndPoint() {
-        if (this.authentication == AuthenticationType.ClientId) {
+        if (this.authentication == AuthenticationType.CLIENT_ID) {
             return this.getClientIdForm().getEndpoint();
         } else {
             return this.getLoginForm().getRealEndpoint();

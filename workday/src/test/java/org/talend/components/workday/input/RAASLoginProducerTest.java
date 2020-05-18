@@ -63,7 +63,7 @@ class RAASLoginProducerTest /* extends WorkdayBaseTest */ {
 
     private WorkdayDataStore buildDS() {
         WorkdayDataStore ds = new WorkdayDataStore();
-        ds.setAuthentication(AuthenticationType.Login);
+        ds.setAuthentication(AuthenticationType.LOGIN);
         ds.getLoginForm().setLogin("lmcneil");
         ds.getLoginForm().setPassword("TLND&WDay1");
         ds.getLoginForm().setTenantAlias("i-0b105ba19af99cff1");

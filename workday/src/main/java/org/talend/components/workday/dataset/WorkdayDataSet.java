@@ -58,19 +58,19 @@ public class WorkdayDataSet implements Serializable, QueryHelper {
 
     @Option
     @Documentation("Execution mode for workday")
-    @ActiveIf(target = "../datastore.authentication", value = "ClientId")
+    @ActiveIf(target = "../datastore.authentication", value = "CLIENT_ID")
     @DefaultValue("RAAS")
     private WorkdayMode mode = WorkdayMode.RAAS;
 
     @Option
     @Documentation("Layout for report as a service")
-    @ActiveIfs(value = { @ActiveIf(target = "../datastore.authentication", value = "Login"),
+    @ActiveIfs(value = { @ActiveIf(target = "../datastore.authentication", value = "LOGIN"),
             @ActiveIf(target = "mode", value = "RAAS") }, operator = Operator.OR)
     private RAASLayout raas;
 
     @Option
     @Documentation("Layout for workday query language")
-    @ActiveIfs(value = { @ActiveIf(target = "../datastore.authentication", value = "ClientId"),
+    @ActiveIfs(value = { @ActiveIf(target = "../datastore.authentication", value = "CLIENT_ID"),
             @ActiveIf(target = "mode", value = "WQL") }, operator = Operator.AND)
     private WQLLayout wql;
 
