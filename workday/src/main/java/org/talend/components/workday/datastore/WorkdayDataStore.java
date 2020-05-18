@@ -31,10 +31,11 @@ import lombok.Data;
 @Version(value = 2)
 @DataStore("WorkdayDataStore")
 @GridLayout({ //
-        @GridLayout.Row({ "clientId", "clientSecret" }), //
-        @GridLayout.Row({ "tenantAlias" }) //
+        @GridLayout.Row({ "authentication" }), //
+        @GridLayout.Row({ "clientIdForm", "loginForm" }) //
 })
-@GridLayout(names = GridLayout.FormType.ADVANCED, value = { @GridLayout.Row("authEndpoint"), @GridLayout.Row("endpoint") })
+@GridLayout(names = GridLayout.FormType.ADVANCED, //
+        value = { @GridLayout.Row({ "clientIdForm", "loginForm" }) })
 @Checkable(UIActionService.HEALTH_CHECK)
 @Documentation("DataStore for workday connector")
 public class WorkdayDataStore implements Serializable {
@@ -42,7 +43,8 @@ public class WorkdayDataStore implements Serializable {
     private static final long serialVersionUID = -8628647674176772061L;
 
     public enum AuthenticationType {
-        ClientId, Login;
+        ClientId,
+        Login;
     }
 
     @Option
@@ -64,8 +66,7 @@ public class WorkdayDataStore implements Serializable {
     public String getEndPoint() {
         if (this.authentication == AuthenticationType.ClientId) {
             return this.getClientIdForm().getEndpoint();
-        }
-        else {
+        } else {
             return this.getLoginForm().getRealEndpoint();
         }
     }

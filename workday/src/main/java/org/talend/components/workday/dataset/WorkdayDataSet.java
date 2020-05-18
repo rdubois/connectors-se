@@ -19,7 +19,10 @@ import java.util.Map;
 import org.talend.components.workday.datastore.WorkdayDataStore;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.configuration.condition.ActiveIf;
+import org.talend.sdk.component.api.configuration.condition.ActiveIfs;
+import org.talend.sdk.component.api.configuration.condition.ActiveIfs.Operator;
 import org.talend.sdk.component.api.configuration.type.DataSet;
+import org.talend.sdk.component.api.configuration.ui.DefaultValue;
 import org.talend.sdk.component.api.configuration.ui.layout.GridLayout;
 import org.talend.sdk.component.api.meta.Documentation;
 
@@ -28,7 +31,9 @@ import lombok.extern.slf4j.Slf4j;
 
 @Data
 @DataSet("WorkdayDataSet")
-@GridLayout({ @GridLayout.Row("datastore"), @GridLayout.Row("mode"), @GridLayout.Row("raas"), @GridLayout.Row("wql") })
+@GridLayout({ @GridLayout.Row("datastore"), //
+        @GridLayout.Row({ "mode" }), //
+        @GridLayout.Row({ "raas", "wql" }) })
 @GridLayout(names = GridLayout.FormType.ADVANCED, value = { @GridLayout.Row("datastore") })
 @Documentation("Dataset for workday")
 @Slf4j
@@ -53,16 +58,20 @@ public class WorkdayDataSet implements Serializable, QueryHelper {
 
     @Option
     @Documentation("Execution mode for workday")
-    private WorkdayMode mode = WorkdayMode.WQL;
+    @ActiveIf(target = "../datastore.authentication", value = "ClientId")
+    @DefaultValue("RAAS")
+    private WorkdayMode mode = WorkdayMode.RAAS;
 
     @Option
     @Documentation("Layout for report as a service")
-    @ActiveIf(target = "mode", value = "RAAS")
+    @ActiveIfs(value = { @ActiveIf(target = "../datastore.authentication", value = "Login"),
+            @ActiveIf(target = "mode", value = "RAAS") }, operator = Operator.OR)
     private RAASLayout raas;
 
     @Option
     @Documentation("Layout for workday query language")
-    @ActiveIf(target = "mode", value = "WQL")
+    @ActiveIfs(value = { @ActiveIf(target = "../datastore.authentication", value = "ClientId"),
+            @ActiveIf(target = "mode", value = "WQL") }, operator = Operator.AND)
     private WQLLayout wql;
 
     @Override

@@ -1,3 +1,15 @@
+/*
+ * Copyright (C) 2006-2020 Talend Inc. - www.talend.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package org.talend.components.workday.input;
 
 import java.util.HashMap;
@@ -16,21 +28,23 @@ public class Migration implements MigrationHandler {
 
     static {
         // as migration is mainly change key with same values, we define this map as old key to new key
-        keyChangeV1toV2.put("configuration.dataSet.datastore.authEndpoint", "configuration.dataSet.datastore.clientIdForm.authEndpoint");
+        keyChangeV1toV2.put("configuration.dataSet.datastore.authEndpoint",
+                "configuration.dataSet.datastore.clientIdForm.authEndpoint");
         keyChangeV1toV2.put("configuration.dataSet.datastore.clientId", "configuration.dataSet.datastore.clientIdForm.clientId");
-        keyChangeV1toV2.put("configuration.dataSet.datastore.clientSecret", "configuration.dataSet.datastore.clientIdForm.clientSecret");
+        keyChangeV1toV2.put("configuration.dataSet.datastore.clientSecret",
+                "configuration.dataSet.datastore.clientIdForm.clientSecret");
         keyChangeV1toV2.put("configuration.dataSet.datastore.endpoint", "configuration.dataSet.datastore.clientIdForm.endpoint");
-        keyChangeV1toV2.put("configuration.dataSet.datastore.tenantAlias", "configuration.dataSet.datastore.clientIdForm.tenantAlias");
+        keyChangeV1toV2.put("configuration.dataSet.datastore.tenantAlias",
+                "configuration.dataSet.datastore.clientIdForm.tenantAlias");
     }
 
     @Override
-    public Map<String, String> migrate(int incomingVersion,
-                                       Map<String, String> incomingData) {
+    public Map<String, String> migrate(int incomingVersion, Map<String, String> incomingData) {
         log.info("Starting Workday Producer Migration from " + incomingVersion);
         if (incomingVersion == 1) {
             final Map<String, String> newConfig = incomingData.entrySet() //
-                    .stream()  //
-                    .map(KeyVal::fromEntry)  // entrySet to key val
+                    .stream() //
+                    .map(KeyVal::fromEntry) // entrySet to key val
                     .map(KeyVal.keyFunc(this::changeKey)) // apply changeKey to key of KeyVal instances
                     .collect(Collectors.toMap(KeyVal::getKey, KeyVal::getValue));
 
@@ -42,6 +56,7 @@ public class Migration implements MigrationHandler {
 
     /**
      * Search new key from old key.
+     * 
      * @param key : old key
      * @return new key
      */
@@ -57,6 +72,7 @@ public class Migration implements MigrationHandler {
      * class to manipulate key/value for map.
      */
     private static class KeyVal {
+
         private final String key;
 
         private final String value;
@@ -80,10 +96,11 @@ public class Migration implements MigrationHandler {
 
         /**
          * Apply a function on key to get a new KeyVal instance.
+         * 
          * @param fkey : function to apply on key.
          * @return new KeyVal.
          */
-        public KeyVal applyKey(Function<String , String> fkey) {
+        public KeyVal applyKey(Function<String, String> fkey) {
             final String newKey = fkey.apply(this.key);
             return new KeyVal(newKey, this.value);
         }
@@ -91,6 +108,7 @@ public class Migration implements MigrationHandler {
         /**
          * Transform key transform function to KeyVal transform function.
          * (Simplify usage in stream)
+         * 
          * @param fkey : key function.
          * @return keyVal function.
          */

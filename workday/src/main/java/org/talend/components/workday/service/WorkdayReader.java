@@ -37,7 +37,6 @@ public interface WorkdayReader extends HttpClient {
      * @return response of workday call
      */
     @Request(path = "/{service}", method = "GET")
-    Response<JsonObject> search(@Header("Authorization") String token,
-                                @Path("service") String servicePath,
-                                @QueryParams(encode = false) Map<String, String> othersParam);
+    Response<JsonObject> search(@Header("Authorization") String token, @Path("service") String servicePath,
+            @QueryParams(encode = false) Map<String, String> othersParam);
 }

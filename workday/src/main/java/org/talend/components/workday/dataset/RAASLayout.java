@@ -61,7 +61,7 @@ public class RAASLayout implements Serializable, QueryHelper {
     }
 
     private String getServicePattern(WorkdayDataStore.AuthenticationType authType) {
-        if (authType ==  WorkdayDataStore.AuthenticationType.Login) {
+        if (authType == WorkdayDataStore.AuthenticationType.Login) {
             return "%s/%s";
         }
         return "raas/%s/%s";

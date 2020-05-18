@@ -42,7 +42,7 @@ public class WorkdayReaderService {
     private AccessTokenService accessToken;
 
     public JsonObject find(WorkdayDataStore datastore, QueryHelper helper, Map<String, String> queryParams) {
-        final String authorizeHeader =  this.findAuthorizationHeader(datastore);
+        final String authorizeHeader = this.findAuthorizationHeader(datastore);
 
         final String endPoint = datastore.getEndPoint();
         this.reader.base(endPoint);
