@@ -27,7 +27,7 @@ import org.talend.sdk.component.api.input.Emitter;
 import org.talend.sdk.component.api.input.Producer;
 import org.talend.sdk.component.api.meta.Documentation;
 
-@Version(value = 2, migrationHandler = Migration.class)
+@Version(value = 1)
 @Icon(value = Icon.IconType.CUSTOM, custom = "WorkdayInput")
 @Emitter(family = "Workday", name = "Input")
 @Documentation("Component to extract data from workday ERP via Workday Query Language or Report As A Service")

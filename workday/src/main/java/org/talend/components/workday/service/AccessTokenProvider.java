@@ -20,7 +20,6 @@ import javax.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.workday.WorkdayException;
-import org.talend.components.workday.datastore.ClientIdForm;
 import org.talend.components.workday.datastore.Token;
 import org.talend.components.workday.datastore.WorkdayDataStore;
 import org.talend.sdk.component.api.service.http.Header;
@@ -39,12 +38,12 @@ public interface AccessTokenProvider extends HttpClient {
 
     default Token getAccessToken(WorkdayDataStore ds) {
         Instant nowUTC = Instant.now();
-        final ClientIdForm clientIdForm = ds.getClientIdForm();
-        this.base(clientIdForm.getAuthEndpoint());
 
-        final String payload = "tenant_alias=" + clientIdForm.getTenantAlias() + "&grant_type=client_credentials";
+        this.base(ds.getAuthEndpoint());
 
-        Response<JsonObject> result = this.getAuthorizationToken(clientIdForm.getAuthorizationHeader(), payload);
+        final String payload = "tenant_alias=" + ds.getTenantAlias() + "&grant_type=client_credentials";
+
+        Response<JsonObject> result = this.getAuthorizationToken(ds.getAuthorizationHeader(), payload);
         if (result.status() / 100 != 2) {
             String errorLib = result.error(String.class);
             log.error("Error while trying get token : HTTP {} : {}", result.status(), errorLib);

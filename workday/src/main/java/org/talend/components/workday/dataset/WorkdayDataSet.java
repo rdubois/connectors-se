@@ -16,7 +16,6 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
-import org.talend.components.workday.datastore.Migration;
 import org.talend.components.workday.datastore.WorkdayDataStore;
 import org.talend.sdk.component.api.component.Version;
 import org.talend.sdk.component.api.configuration.Option;
@@ -32,7 +31,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Data
-@Version(value = 2, migrationHandler = Migration.class)
+@Version(value = 1)
 @DataSet("WorkdayDataSet")
 @GridLayout({ @GridLayout.Row("datastore"), //
         @GridLayout.Row({ "mode" }), //
@@ -62,8 +61,8 @@ public class WorkdayDataSet implements Serializable, QueryHelper {
     @Option
     @Documentation("Execution mode for workday")
     @ActiveIf(target = "../datastore.authentication", value = "CLIENT_ID")
-    @DefaultValue("RAAS")
-    private WorkdayMode mode = WorkdayMode.RAAS;
+    @DefaultValue("WQL")
+    private WorkdayMode mode = WorkdayMode.WQL;
 
     @Option
     @Documentation("Layout for report as a service")

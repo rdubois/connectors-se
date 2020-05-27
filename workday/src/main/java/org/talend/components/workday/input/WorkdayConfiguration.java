@@ -23,7 +23,7 @@ import org.talend.sdk.component.api.meta.Documentation;
 import lombok.Data;
 
 @Data
-@Version(value = 2)
+@Version(value = 1)
 @GridLayout(value = { @GridLayout.Row({ "dataSet" }) })
 @GridLayout(names = GridLayout.FormType.ADVANCED, value = { @GridLayout.Row("dataSet") })
 @Documentation("Workday configuration")

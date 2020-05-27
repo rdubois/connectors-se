@@ -44,7 +44,7 @@ public class WorkdayReaderService {
     public JsonObject find(WorkdayDataStore datastore, QueryHelper helper, Map<String, String> queryParams) {
         final String authorizeHeader = this.findAuthorizationHeader(datastore);
 
-        final String endPoint = datastore.getEndPoint();
+        final String endPoint = datastore.getWorkdayEndPoint();
         this.reader.base(endPoint);
 
         final String serviceToCall = helper.getServiceToCall(datastore);
