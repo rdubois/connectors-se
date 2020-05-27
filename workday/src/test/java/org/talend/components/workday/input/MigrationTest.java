@@ -35,9 +35,10 @@ class MigrationTest {
         config.put("configuration.dataSet.datastore.other", "other");
 
         final Map<String, String> configV2 = migration.migrate(1, config);
-        Assertions.assertEquals(config.size() + 1, configV2.size(), "unexpected size");
+        Assertions.assertEquals(config.size() + 3, configV2.size(), "unexpected size");
         Assertions.assertEquals("authEndpoint", configV2.get("configuration.dataSet.datastore.clientIdForm.authEndpoint"));
         Assertions.assertEquals("other", configV2.get("configuration.dataSet.datastore.other"));
         Assertions.assertEquals("clientId", configV2.get("configuration.dataSet.datastore.clientIdForm.clientId"));
+        Assertions.assertEquals("WQL", configV2.get("configuration.dataSet.mode"));
     }
 }

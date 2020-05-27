@@ -28,7 +28,7 @@ import org.talend.sdk.component.api.meta.Documentation;
 import lombok.Data;
 
 @Data
-@Version(value = 2)
+@Version(value = 2, migrationHandler = Migration.class)
 @DataStore("WorkdayDataStore")
 @GridLayout({ //
         @GridLayout.Row({ "authentication" }), //

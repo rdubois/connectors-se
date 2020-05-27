@@ -1,0 +1,36 @@
+== Common collections
+
+This package is for easier manipulation of collections.
+
+
+=== Iterators.
+
+This classes are for Iterator manipulations as streams.
+
+
+[source,java]
+----
+    IteratorComposer.of(myIterator) // wrap my Iterator
+                    .map(myfunc)    // map function (as stream.map)
+                    .flatmap(f2)    // flatmap as streams.flatmap
+                    .skipFooter(3)  // ignore 3 last elements
+                    .build();       // build
+----
+
+
+
+==== KeyValue.
+
+facilitate map in streams
+[source,java]
+----
+    map.entrySet() //
+       .stream() //
+       .map(KeyValue::fromEntry) // entrySet to key val
+       .map(KeyValue.keyFunc(this::changeKey)) // apply changeKey to key of KeyVal instances
+       .collect(Collectors.toMap(KeyValue::getKey, KeyValue::getValue));
+----
+
+
+
+

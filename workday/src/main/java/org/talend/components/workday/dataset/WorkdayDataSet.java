@@ -16,7 +16,9 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
+import org.talend.components.workday.datastore.Migration;
 import org.talend.components.workday.datastore.WorkdayDataStore;
+import org.talend.sdk.component.api.component.Version;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.configuration.condition.ActiveIf;
 import org.talend.sdk.component.api.configuration.condition.ActiveIfs;
@@ -30,6 +32,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Data
+@Version(value = 2, migrationHandler = Migration.class)
 @DataSet("WorkdayDataSet")
 @GridLayout({ @GridLayout.Row("datastore"), //
         @GridLayout.Row({ "mode" }), //
