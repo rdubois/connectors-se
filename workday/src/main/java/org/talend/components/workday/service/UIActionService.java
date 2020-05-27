@@ -48,7 +48,7 @@ public class UIActionService {
             this.service.getAccessToken(dataStore);
             return new HealthCheckStatus(OK, this.i18n.healthCheckOk());
         } catch (Exception e) {
-            return new HealthCheckStatus(KO, this.i18n.healthCheckFailed("msg", e.getMessage()));
+            return new HealthCheckStatus(KO, this.i18n.healthCheckFailed(e.getMessage()));
         }
     }
 

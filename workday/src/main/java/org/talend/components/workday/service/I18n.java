@@ -19,5 +19,5 @@ public interface I18n {
 
     String healthCheckOk();
 
-    String healthCheckFailed(final String msg, final String cause);
+    String healthCheckFailed(final String cause);
 }

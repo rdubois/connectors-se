@@ -28,7 +28,7 @@ import org.talend.sdk.component.junit5.WithComponents;
 
 @HttpApi(useSsl = true)
 @WithComponents("org.talend.components.workday")
-class RAASLoginProducerTest /* extends WorkdayBaseTest */ {
+class RAASLoginProducerTest {
 
     private WorkdayDataSet dataset;
 

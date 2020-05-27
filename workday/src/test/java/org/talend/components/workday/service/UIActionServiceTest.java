@@ -71,7 +71,7 @@ class UIActionServiceTest extends WorkdayBaseTest {
             }
 
             @Override
-            public String healthCheckFailed(String msg, String cause) {
+            public String healthCheckFailed(String cause) {
                 return "KO";
             }
         };
