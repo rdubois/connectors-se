@@ -17,7 +17,6 @@ import java.nio.charset.Charset;
 import java.util.Base64;
 
 import org.talend.components.workday.service.UIActionService;
-import org.talend.sdk.component.api.component.Version;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.configuration.action.Checkable;
 import org.talend.sdk.component.api.configuration.action.Validable;
@@ -32,7 +31,6 @@ import org.talend.sdk.component.api.meta.Documentation;
 import lombok.Data;
 
 @Data
-@Version(value = 1)
 @DataStore("WorkdayDataStore")
 @GridLayout({ //
         @GridLayout.Row({ "authentication" }), //
@@ -45,7 +43,7 @@ import lombok.Data;
 @Documentation("DataStore for workday connector")
 public class WorkdayDataStore implements Serializable {
 
-    private static final long serialVersionUID = 8254399046469388027L;
+    private static final long serialVersionUID = -8628647674176772061L; // 8254399046469388027L;
 
     public enum AuthenticationType {
         CLIENT_ID,
