@@ -43,7 +43,7 @@ import lombok.Data;
 @Documentation("DataStore for workday connector")
 public class WorkdayDataStore implements Serializable {
 
-    private static final long serialVersionUID = -8628647674176772061L; // 8254399046469388027L;
+    private static final long serialVersionUID = -8628647674176772061L;
 
     public enum AuthenticationType {
         CLIENT_ID,
