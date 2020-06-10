@@ -34,11 +34,12 @@ import lombok.Data;
 @DataStore("WorkdayDataStore")
 @GridLayout({ //
         @GridLayout.Row({ "authentication" }), //
-        @GridLayout.Row({ "clientId", "clientSecret", "loginForm" }), //
+        @GridLayout.Row({ "clientId", "clientSecret" }), //
+        @GridLayout.Row({ "loginForm" }), //
         @GridLayout.Row({ "tenantAlias" }) //
 })
 @GridLayout(names = GridLayout.FormType.ADVANCED, //
-        value = { @GridLayout.Row({ "authEndpoint", "loginForm" }), @GridLayout.Row("endpoint") })
+        value = { @GridLayout.Row({ "authEndpoint" }), @GridLayout.Row({ "loginForm" }), @GridLayout.Row("endpoint") })
 @Checkable(UIActionService.HEALTH_CHECK)
 @Documentation("DataStore for workday connector")
 public class WorkdayDataStore implements Serializable {
@@ -59,6 +60,7 @@ public class WorkdayDataStore implements Serializable {
     @Option
     @Validable(UIActionService.VALIDATION_URL_PROPERTY)
     @Documentation("Workday token Auth Endpoint (host only, ie: https://auth.api.workday.com/v1/token)")
+    @ActiveIf(target = "authentication", value = "CLIENT_ID")
     private String authEndpoint = "https://auth.api.workday.com";
 
     @Option
