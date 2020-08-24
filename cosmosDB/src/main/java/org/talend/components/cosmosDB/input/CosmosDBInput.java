@@ -18,6 +18,8 @@ import com.microsoft.azure.documentdb.FeedOptions;
 import com.microsoft.azure.documentdb.FeedResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.talend.components.common.stream.input.json.JsonToRecord;
+import org.talend.components.cosmosDB.dataset.CosmosDBDataset;
+import org.talend.components.cosmosDB.dataset.QueryDataset;
 import org.talend.components.cosmosDB.service.CosmosDBService;
 import org.talend.components.cosmosDB.service.I18nMessage;
 import org.talend.sdk.component.api.configuration.Option;
@@ -61,6 +63,22 @@ public class CosmosDBInput implements Serializable {
         this.i18n = i18n;
         this.jsonToRecord = new JsonToRecord(builderFactory, configuration.isJsonForceDouble());
     }
+
+    public CosmosDBInput(@Option("dataset") final CosmosDBDataset dataset, final CosmosDBService service,
+                         final RecordBuilderFactory builderFactory, final I18nMessage i18n) {
+        CosmosDBInputConfiguration cosmosDBInputConfiguration = new CosmosDBInputConfiguration();
+        QueryDataset queryDataset = new QueryDataset();
+        queryDataset.setCollectionID(dataset.getCollectionID());
+        cosmosDBInputConfiguration.setDataset(queryDataset);
+        this.configuration = cosmosDBInputConfiguration;
+        this.service = service;
+        this.builderFactory = builderFactory;
+        this.i18n = i18n;
+        this.jsonToRecord = new JsonToRecord(builderFactory, configuration.isJsonForceDouble());
+    }
+
+
+
 
     @PostConstruct
     public void init() {
