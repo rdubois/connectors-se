@@ -10,21 +10,16 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.talend.components.cosmosDB.dataset;
-
-import org.talend.components.cosmosDB.datastore.CosmosDBDataStore;
+package org.talend.components.cosmosDB.input;
 
 import java.io.Serializable;
-import java.util.List;
 
-public interface BaseDataSet extends Serializable {
+import org.talend.components.cosmosDB.dataset.BaseDataSet;
 
-    CosmosDBDataStore getDatastore();
+public interface InputConfig extends Serializable {
 
-    String getCollectionID();
+    BaseDataSet getDataset();
 
-    boolean isUseQuery();
-
-    String getQuery();
+    boolean isJsonForceDouble();
 
 }

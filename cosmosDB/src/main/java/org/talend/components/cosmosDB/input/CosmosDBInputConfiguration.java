@@ -12,7 +12,6 @@
  */
 package org.talend.components.cosmosDB.input;
 
-import lombok.Data;
 import org.talend.components.cosmosDB.dataset.QueryDataset;
 import org.talend.sdk.component.api.component.Version;
 import org.talend.sdk.component.api.configuration.Option;
@@ -21,7 +20,7 @@ import org.talend.sdk.component.api.configuration.ui.layout.GridLayout;
 import org.talend.sdk.component.api.configuration.ui.layout.GridLayouts;
 import org.talend.sdk.component.api.meta.Documentation;
 
-import java.io.Serializable;
+import lombok.Data;
 
 @Version(1)
 @Data
@@ -29,7 +28,7 @@ import java.io.Serializable;
         }), @GridLayout(names = GridLayout.FormType.ADVANCED, value = { @GridLayout.Row({ "dataset" }),
                 @GridLayout.Row({ "jsonForceDouble" }) }) })
 @Documentation("cosmosDB input Mapper Configuration")
-public class CosmosDBInputConfiguration implements Serializable {
+public class CosmosDBInputConfiguration implements InputConfig {
 
     @Option
     @Documentation("dataset")

@@ -12,32 +12,14 @@
  */
 package org.talend.components.cosmosDB.input;
 
-import java.io.Serializable;
-import java.io.StringReader;
-import java.util.Iterator;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
-
-import org.talend.components.common.stream.input.json.JsonToRecord;
 import org.talend.components.cosmosDB.service.CosmosDBService;
 import org.talend.components.cosmosDB.service.I18nMessage;
 import org.talend.sdk.component.api.component.Icon;
 import org.talend.sdk.component.api.component.Version;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.input.Emitter;
-import org.talend.sdk.component.api.input.Producer;
 import org.talend.sdk.component.api.meta.Documentation;
-import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
-
-import com.microsoft.azure.documentdb.Document;
-import com.microsoft.azure.documentdb.DocumentClient;
-import com.microsoft.azure.documentdb.FeedOptions;
-import com.microsoft.azure.documentdb.FeedResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,61 +28,11 @@ import lombok.extern.slf4j.Slf4j;
 @Documentation("This component reads data from cosmosDB.")
 @Emitter(name = "CollectionID")
 @Icon(value = Icon.IconType.CUSTOM, custom = "CosmosDBInput")
-public class CosmosDBCollectionInput implements Serializable {
-
-    private I18nMessage i18n;
-
-    private final CosmosDBCollectionInputConfiguration configuration;
-
-    private final RecordBuilderFactory builderFactory;
-
-    private transient CosmosDBService service;
-
-    private transient DocumentClient client;
-
-    final JsonToRecord jsonToRecord;
-
-    Iterator<Document> iterator;
+public class CosmosDBCollectionInput extends AbstractInput {
 
     public CosmosDBCollectionInput(@Option("configuration") final CosmosDBCollectionInputConfiguration configuration,
             final CosmosDBService service, final RecordBuilderFactory builderFactory, final I18nMessage i18n) {
-        this.configuration = configuration;
-        this.service = service;
-        this.builderFactory = builderFactory;
-        this.i18n = i18n;
-        this.jsonToRecord = new JsonToRecord(builderFactory, configuration.isJsonForceDouble());
-    }
+        super(configuration, service, builderFactory, i18n);
 
-    @PostConstruct
-    public void init() {
-        client = service.documentClientFrom(configuration.getDataset().getDatastore());
-        iterator = getResults(configuration.getDataset().getDatastore().getDatabaseID(),
-                configuration.getDataset().getCollectionID());
-    }
-
-    @Producer
-    public Record next() {
-        if (iterator.hasNext()) {
-            Document next = iterator.next();
-            JsonReader reader = Json.createReader(new StringReader(next.toJson()));
-            JsonObject jsonObject = reader.readObject();
-            Record record = jsonToRecord.toRecord(jsonObject);
-            return record;
-        }
-        return null;
-    }
-
-    @PreDestroy
-    public void release() {
-        if (client != null) {
-            client.close();
-        }
-    }
-
-    private Iterator<Document> getResults(String databaseName, String collectionName) {
-        String collectionLink = String.format("/dbs/%s/colls/%s", databaseName, collectionName);
-        FeedResponse<Document> queryResults;
-        queryResults = client.readDocuments(collectionLink, null);
-        return queryResults.getQueryIterator();
     }
 }

@@ -43,4 +43,13 @@ public class CosmosDBDataset implements BaseDataSet {
     @Documentation("Collection ID")
     private String collectionID;
 
+    @Override
+    public boolean isUseQuery() {
+        return false;
+    }
+
+    @Override
+    public String getQuery() {
+        return null;
+    }
 }
