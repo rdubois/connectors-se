@@ -22,7 +22,10 @@ import org.talend.components.cosmosDB.dataset.CosmosDBDataset;
 import org.talend.components.cosmosDB.dataset.QueryDataset;
 import org.talend.components.cosmosDB.service.CosmosDBService;
 import org.talend.components.cosmosDB.service.I18nMessage;
+import org.talend.sdk.component.api.component.Icon;
+import org.talend.sdk.component.api.component.Version;
 import org.talend.sdk.component.api.configuration.Option;
+import org.talend.sdk.component.api.input.Emitter;
 import org.talend.sdk.component.api.input.Producer;
 import org.talend.sdk.component.api.meta.Documentation;
 import org.talend.sdk.component.api.record.Record;
@@ -37,8 +40,11 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.util.Iterator;
 
+@Version(1)
 @Slf4j
 @Documentation("This component reads data from cosmosDB.")
+@Emitter(name = "Query")
+@Icon(value = Icon.IconType.CUSTOM, custom = "CosmosDBInput")
 public class CosmosDBInput implements Serializable {
 
     private I18nMessage i18n;

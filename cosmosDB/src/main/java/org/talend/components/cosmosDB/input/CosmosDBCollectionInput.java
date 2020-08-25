@@ -25,7 +25,10 @@ import javax.json.JsonReader;
 import org.talend.components.common.stream.input.json.JsonToRecord;
 import org.talend.components.cosmosDB.service.CosmosDBService;
 import org.talend.components.cosmosDB.service.I18nMessage;
+import org.talend.sdk.component.api.component.Icon;
+import org.talend.sdk.component.api.component.Version;
 import org.talend.sdk.component.api.configuration.Option;
+import org.talend.sdk.component.api.input.Emitter;
 import org.talend.sdk.component.api.input.Producer;
 import org.talend.sdk.component.api.meta.Documentation;
 import org.talend.sdk.component.api.record.Record;
@@ -38,8 +41,11 @@ import com.microsoft.azure.documentdb.FeedResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
+@Version(1)
 @Slf4j
 @Documentation("This component reads data from cosmosDB.")
+@Emitter(name = "CollectionID")
+@Icon(value = Icon.IconType.CUSTOM, custom = "CosmosDBInput")
 public class CosmosDBCollectionInput implements Serializable {
 
     private I18nMessage i18n;
