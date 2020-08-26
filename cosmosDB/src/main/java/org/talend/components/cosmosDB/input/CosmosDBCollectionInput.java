@@ -12,22 +12,17 @@
  */
 package org.talend.components.cosmosDB.input;
 
+import lombok.extern.slf4j.Slf4j;
 import org.talend.components.cosmosDB.service.CosmosDBService;
 import org.talend.components.cosmosDB.service.I18nMessage;
-import org.talend.sdk.component.api.component.Icon;
 import org.talend.sdk.component.api.component.Version;
 import org.talend.sdk.component.api.configuration.Option;
-import org.talend.sdk.component.api.input.Emitter;
 import org.talend.sdk.component.api.meta.Documentation;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Version(1)
 @Slf4j
 @Documentation("This component reads data from cosmosDB.")
-@Emitter(name = "CollectionID")
-@Icon(value = Icon.IconType.CUSTOM, custom = "CosmosDBInput")
 public class CosmosDBCollectionInput extends AbstractInput {
 
     public CosmosDBCollectionInput(@Option("configuration") final CosmosDBCollectionInputConfiguration configuration,
