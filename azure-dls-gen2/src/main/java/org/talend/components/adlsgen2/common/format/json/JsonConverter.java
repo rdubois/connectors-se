@@ -12,6 +12,8 @@
  */
 package org.talend.components.adlsgen2.common.format.json;
 
+import static java.util.stream.Collectors.toList;
+
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Optional;
@@ -34,8 +36,6 @@ import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
 
 import lombok.extern.slf4j.Slf4j;
 
-import static java.util.stream.Collectors.toList;
-
 @Slf4j
 public class JsonConverter implements RecordConverter<JsonObject>, Serializable {
 
@@ -44,8 +44,6 @@ public class JsonConverter implements RecordConverter<JsonObject>, Serializable 
     private RecordBuilderFactory recordBuilderFactory;
 
     private JsonBuilderFactory jsonBuilderFactory;
-
-    private Schema schema;
 
     public static JsonConverter of(final RecordBuilderFactory factory, final JsonBuilderFactory jsonFactory,
             final @Configuration("jsonConfiguration") JsonConfiguration configuration) {
@@ -68,10 +66,7 @@ public class JsonConverter implements RecordConverter<JsonObject>, Serializable 
 
     @Override
     public Record toRecord(final JsonObject record) {
-        if (schema == null || record.keySet().size() > schema.getEntries().size()) {
-            schema = inferSchema(record);
-        }
-        return convertJsonObjectToRecord(schema, record);
+        return convertJsonObjectToRecord(inferSchema(record), record);
     }
 
     @Override
@@ -176,8 +171,7 @@ public class JsonConverter implements RecordConverter<JsonObject>, Serializable 
     }
 
     private void populateJsonObjectEntries(Schema.Builder builder, JsonObject value) {
-        value.entrySet().stream().filter(e -> e.getValue() != javax.json.JsonValue.NULL)
-                .map(s -> createEntry(s.getKey(), s.getValue())).forEach(builder::withEntry);
+        value.entrySet().stream().map(s -> createEntry(s.getKey(), s.getValue())).forEach(builder::withEntry);
     }
 
     public Type translateType(JsonValue value) {
@@ -194,7 +188,7 @@ public class JsonConverter implements RecordConverter<JsonObject>, Serializable 
         case OBJECT:
             return Type.RECORD;
         case NULL:
-            break;
+            return Type.STRING;
         }
         throw new FileFormatRuntimeException("The data type " + value.getValueType() + " is not handled.");
     }
