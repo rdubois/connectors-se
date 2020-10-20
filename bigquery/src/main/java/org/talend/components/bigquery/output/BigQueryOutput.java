@@ -28,15 +28,13 @@ import org.talend.sdk.component.api.processor.BeforeGroup;
 import org.talend.sdk.component.api.processor.ElementListener;
 import org.talend.sdk.component.api.processor.Processor;
 import org.talend.sdk.component.api.record.Record;
-import org.talend.sdk.component.api.service.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static org.talend.sdk.component.api.component.Icon.IconType.BIGQUERY;
+import java.util.UUID;
 
 @Slf4j
 @Version(1)
@@ -66,13 +64,24 @@ public class BigQueryOutput implements Serializable {
 
     private BigQueryService service;
 
+    private transient JobId jobId;
+
     public BigQueryOutput(@Option("configuration") final BigQueryOutputConfig configuration, BigQueryService bigQueryService,
             I18nMessage i18n) {
         this.configuration = configuration;
         this.connection = configuration.getDataSet().getConnection();
         this.tableSchema = bigQueryService.guessSchema(configuration);
         this.service = bigQueryService;
+        this.jobId = getNewUniqueJobId();
         this.i18n = i18n;
+    }
+
+    private JobId getNewUniqueJobId() {
+        bigQuery = service.createClient(connection);
+        do {
+            jobId = JobId.of(UUID.randomUUID().toString() + "-" + System.nanoTime());
+        } while (bigQuery.getJob(jobId) != null);
+        return jobId;
     }
 
     @PostConstruct
@@ -99,6 +108,22 @@ public class BigQueryOutput implements Serializable {
         } else if (configuration.getTableOperation() != BigQueryOutputConfig.TableOperation.CREATE_IF_NOT_EXISTS) {
             throw new BigQueryConnectorException(i18n.infoTableNoExists(
                     configuration.getDataSet().getBqDataset() + "." + configuration.getDataSet().getTableName()));
+        }
+        if (BigQueryOutputConfig.TableOperation.TRUNCATE == configuration.getTableOperation()) {
+            QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder("CREATE OR REPLACE TABLE "
+                    + connection.getProjectName() + "." + configuration.getDataSet().getBqDataset() + "."
+                    + configuration.getDataSet().getTableName() + " AS SELECT * FROM " + connection.getProjectName() + "."
+                    + configuration.getDataSet().getBqDataset() + "." + configuration.getDataSet().getTableName() + " LIMIT 0;")
+                    .setUseLegacySql(false).build();
+            Job job = bigQuery.create(JobInfo.newBuilder(queryConfig).setJobId(jobId).build());
+            try {
+                job = job.waitFor();
+            } catch (InterruptedException e) {
+                throw new BigQueryConnectorException(i18n.errorQueryExecution(), e);
+            }
+            if (job.isDone()) {
+                log.info("Truncate query completed");
+            }
         }
     }
 
