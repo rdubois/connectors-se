@@ -64,7 +64,7 @@ public class BigQueryOutput implements Serializable {
 
     private BigQueryService service;
 
-    private transient JobId jobId;
+    private JobId jobId;
 
     public BigQueryOutput(@Option("configuration") final BigQueryOutputConfig configuration, BigQueryService bigQueryService,
             I18nMessage i18n) {
@@ -110,10 +110,10 @@ public class BigQueryOutput implements Serializable {
                     configuration.getDataSet().getBqDataset() + "." + configuration.getDataSet().getTableName()));
         }
         if (BigQueryOutputConfig.TableOperation.TRUNCATE == configuration.getTableOperation()) {
-            QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder("CREATE OR REPLACE TABLE "
+            QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder("CREATE OR REPLACE TABLE `"
                     + connection.getProjectName() + "." + configuration.getDataSet().getBqDataset() + "."
-                    + configuration.getDataSet().getTableName() + " AS SELECT * FROM " + connection.getProjectName() + "."
-                    + configuration.getDataSet().getBqDataset() + "." + configuration.getDataSet().getTableName() + " LIMIT 0;")
+                    + configuration.getDataSet().getTableName() + "` AS SELECT * FROM `" + connection.getProjectName() + "."
+                    + configuration.getDataSet().getBqDataset() + "." + configuration.getDataSet().getTableName() + "` LIMIT 0;")
                     .setUseLegacySql(false).build();
             Job job = bigQuery.create(JobInfo.newBuilder(queryConfig).setJobId(jobId).build());
             try {
