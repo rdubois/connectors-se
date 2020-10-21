@@ -64,7 +64,6 @@ public class BigQueryOutput implements Serializable {
 
     private BigQueryService service;
 
-    private JobId jobId;
 
     public BigQueryOutput(@Option("configuration") final BigQueryOutputConfig configuration, BigQueryService bigQueryService,
             I18nMessage i18n) {
@@ -72,12 +71,33 @@ public class BigQueryOutput implements Serializable {
         this.connection = configuration.getDataSet().getConnection();
         this.tableSchema = bigQueryService.guessSchema(configuration);
         this.service = bigQueryService;
-        this.jobId = getNewUniqueJobId();
         this.i18n = i18n;
+        truncateTableIfNeeded();
     }
 
-    private JobId getNewUniqueJobId() {
-        bigQuery = service.createClient(connection);
+    private void truncateTableIfNeeded() {
+        if (BigQueryOutputConfig.TableOperation.TRUNCATE == configuration.getTableOperation()) {
+            bigQuery = service.createClient(connection);
+            QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder("CREATE OR REPLACE TABLE "
+                    + connection.getProjectName() + "." + configuration.getDataSet().getBqDataset() + "."
+                    + configuration.getDataSet().getTableName() + " AS SELECT * FROM " + connection.getProjectName() + "."
+                    + configuration.getDataSet().getBqDataset() + "." + configuration.getDataSet().getTableName() + " LIMIT 0;")
+                    .setUseLegacySql(false).build();
+            Job job = bigQuery.create(JobInfo.newBuilder(queryConfig).setJobId(getNewUniqueJobId(bigQuery)).build());
+            try {
+                job = job.waitFor();
+            } catch (InterruptedException e) {
+                throw new BigQueryConnectorException(i18n.errorQueryExecution(), e);
+            }
+            if (job.isDone()) {
+                log.info("Truncate query successfully completed");
+            }
+        }
+
+    }
+
+    private JobId getNewUniqueJobId(BigQuery bigQuery) {
+        JobId jobId;
         do {
             jobId = JobId.of(UUID.randomUUID().toString() + "-" + System.nanoTime());
         } while (bigQuery.getJob(jobId) != null);
@@ -108,22 +128,6 @@ public class BigQueryOutput implements Serializable {
         } else if (configuration.getTableOperation() != BigQueryOutputConfig.TableOperation.CREATE_IF_NOT_EXISTS) {
             throw new BigQueryConnectorException(i18n.infoTableNoExists(
                     configuration.getDataSet().getBqDataset() + "." + configuration.getDataSet().getTableName()));
-        }
-        if (BigQueryOutputConfig.TableOperation.TRUNCATE == configuration.getTableOperation()) {
-            QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder("CREATE OR REPLACE TABLE `"
-                    + connection.getProjectName() + "." + configuration.getDataSet().getBqDataset() + "."
-                    + configuration.getDataSet().getTableName() + "` AS SELECT * FROM `" + connection.getProjectName() + "."
-                    + configuration.getDataSet().getBqDataset() + "." + configuration.getDataSet().getTableName() + "` LIMIT 0;")
-                    .setUseLegacySql(false).build();
-            Job job = bigQuery.create(JobInfo.newBuilder(queryConfig).setJobId(jobId).build());
-            try {
-                job = job.waitFor();
-            } catch (InterruptedException e) {
-                throw new BigQueryConnectorException(i18n.errorQueryExecution(), e);
-            }
-            if (job.isDone()) {
-                log.info("Truncate query completed");
-            }
         }
     }
 
