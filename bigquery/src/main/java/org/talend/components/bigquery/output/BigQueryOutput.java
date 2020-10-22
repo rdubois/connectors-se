@@ -30,6 +30,7 @@ import org.talend.sdk.component.api.processor.Processor;
 import org.talend.sdk.component.api.record.Record;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,8 +63,9 @@ public class BigQueryOutput implements Serializable {
 
     private transient TableId tableId;
 
-    private BigQueryService service;
+    private transient TableId tempTableId;
 
+    private BigQueryService service;
 
     public BigQueryOutput(@Option("configuration") final BigQueryOutputConfig configuration, BigQueryService bigQueryService,
             I18nMessage i18n) {
@@ -78,16 +80,16 @@ public class BigQueryOutput implements Serializable {
     private void truncateTableIfNeeded() {
         if (BigQueryOutputConfig.TableOperation.TRUNCATE == configuration.getTableOperation()) {
             bigQuery = service.createClient(connection);
-            QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder("CREATE OR REPLACE TABLE "
+            QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder("CREATE OR REPLACE TABLE `"
                     + connection.getProjectName() + "." + configuration.getDataSet().getBqDataset() + "."
-                    + configuration.getDataSet().getTableName() + " AS SELECT * FROM " + connection.getProjectName() + "."
-                    + configuration.getDataSet().getBqDataset() + "." + configuration.getDataSet().getTableName() + " LIMIT 0;")
+                    + configuration.getDataSet().getTableName() + "` AS SELECT * FROM `" + connection.getProjectName() + "."
+                    + configuration.getDataSet().getBqDataset() + "." + configuration.getDataSet().getTableName() + "` LIMIT 0")
                     .setUseLegacySql(false).build();
             Job job = bigQuery.create(JobInfo.newBuilder(queryConfig).setJobId(getNewUniqueJobId(bigQuery)).build());
             try {
                 job = job.waitFor();
             } catch (InterruptedException e) {
-                throw new BigQueryConnectorException(i18n.errorQueryExecution(), e);
+                log.warn(i18n.errorQueryExecution(), e);
             }
             if (job.isDone()) {
                 log.info("Truncate query successfully completed");
@@ -99,9 +101,18 @@ public class BigQueryOutput implements Serializable {
     private JobId getNewUniqueJobId(BigQuery bigQuery) {
         JobId jobId;
         do {
-            jobId = JobId.of(UUID.randomUUID().toString() + "-" + System.nanoTime());
+            jobId = JobId.of(UUID.randomUUID().toString());
         } while (bigQuery.getJob(jobId) != null);
         return jobId;
+    }
+
+    private TableId getNewUniqueTableId(BigQuery bigQuery) {
+        TableId tableId;
+        do {
+            tableId = TableId.of(connection.getProjectName(), configuration.getDataSet().getBqDataset(),
+                    UUID.randomUUID().toString().replaceAll("-", ""));
+        } while (bigQuery.getTable(tableId) != null);
+        return tableId;
     }
 
     @PostConstruct
@@ -129,6 +140,9 @@ public class BigQueryOutput implements Serializable {
             throw new BigQueryConnectorException(i18n.infoTableNoExists(
                     configuration.getDataSet().getBqDataset() + "." + configuration.getDataSet().getTableName()));
         }
+        if (BigQueryOutputConfig.TableOperation.TRUNCATE == configuration.getTableOperation()) {
+            tempTableId = getNewUniqueTableId(bigQuery);
+        }
     }
 
     @BeforeGroup
@@ -144,19 +158,7 @@ public class BigQueryOutput implements Serializable {
             tableSchema = service.guessSchema(records.get(0));
 
             if (tableSchema != null) {
-                try {
-                    Table table = bigQuery.getTable(tableId);
-                    if (table == null) {
-                        log.info(i18n.infoTableNoExists(
-                                configuration.getDataSet().getBqDataset() + "." + configuration.getDataSet().getTableName()));
-                        TableInfo tableInfo = TableInfo.newBuilder(tableId, StandardTableDefinition.of(tableSchema)).build();
-                        table = bigQuery.create(tableInfo);
-                        log.info(i18n.infoTableCreated(tableId.getTable()));
-                    }
-                } catch (BigQueryException e) {
-                    log.warn(i18n.errorCreationTable() + e.getMessage(), e);
-
-                }
+                createTableIfNotExist(bigQuery, tableId);
             }
             if (tableSchema == null) {
                 // Retry reading table metadata, in case another worker created if meanwhile
@@ -167,6 +169,30 @@ public class BigQueryOutput implements Serializable {
             }
         }
 
+        if (BigQueryOutputConfig.TableOperation.TRUNCATE == configuration.getTableOperation()) {
+            createTableIfNotExist(bigQuery, tempTableId);
+            streamDataToTable(tempTableId);
+        } else {
+            streamDataToTable(tableId);
+        }
+    }
+
+    private void createTableIfNotExist(BigQuery bigQuery, TableId tableId) {
+        try {
+            Table table = bigQuery.getTable(tableId);
+            if (table == null) {
+                log.info(i18n.infoTableNoExists(configuration.getDataSet().getBqDataset() + "." + tableId.getTable()));
+                TableInfo tableInfo = TableInfo.newBuilder(tableId, StandardTableDefinition.of(tableSchema)).build();
+                bigQuery.create(tableInfo);
+                log.info(i18n.infoTableCreated(tableId.getTable()));
+            }
+        } catch (BigQueryException e) {
+            log.warn(i18n.errorCreationTable() + e.getMessage(), e);
+
+        }
+    }
+
+    private void streamDataToTable(TableId tableId) {
         TacoKitRecordToTableRowConverter converter = new TacoKitRecordToTableRowConverter(tableSchema, i18n);
 
         int nbRecordsToSend = records.size();
@@ -199,6 +225,24 @@ public class BigQueryOutput implements Serializable {
             }
 
             nbRecordsSent += recordsBuffer.size();
+        }
+    }
+
+    @PreDestroy
+    public void release() {
+        if (BigQueryOutputConfig.TableOperation.TRUNCATE == configuration.getTableOperation()) {
+            QueryJobConfiguration queryConfig = QueryJobConfiguration
+                    .newBuilder("INSERT `" + connection.getProjectName() + "." + configuration.getDataSet().getBqDataset() + "."
+                            + configuration.getDataSet().getTableName() + "` SELECT * FROM `" + connection.getProjectName() + "."
+                            + configuration.getDataSet().getBqDataset() + "." + tempTableId.getTable() + "`")
+                    .setUseLegacySql(false).build();
+            Job job = bigQuery.create(JobInfo.newBuilder(queryConfig).setJobId(getNewUniqueJobId(bigQuery)).build());
+            try {
+                job = job.waitFor();
+            } catch (InterruptedException e) {
+                log.warn(i18n.errorQueryExecution(), e);
+            }
+            bigQuery.delete(tempTableId);
         }
     }
 
