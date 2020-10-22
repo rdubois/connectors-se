@@ -80,10 +80,16 @@ public class BigQueryOutput implements Serializable {
     private void truncateTableIfNeeded() {
         if (BigQueryOutputConfig.TableOperation.TRUNCATE == configuration.getTableOperation()) {
             bigQuery = service.createClient(connection);
-            QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder("CREATE OR REPLACE TABLE `"
+            tableId = TableId.of(connection.getProjectName(), configuration.getDataSet().getBqDataset(),
+                    configuration.getDataSet().getTableName());
+            Table table = bigQuery.getTable(tableId);
+            if (table == null) {
+                throw new BigQueryConnectorException(i18n.infoTableNoExists(
+                        configuration.getDataSet().getBqDataset() + "." + configuration.getDataSet().getTableName()));
+            }
+            QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder("TRUNCATE TABLE  `"
                     + connection.getProjectName() + "." + configuration.getDataSet().getBqDataset() + "."
-                    + configuration.getDataSet().getTableName() + "` AS SELECT * FROM `" + connection.getProjectName() + "."
-                    + configuration.getDataSet().getBqDataset() + "." + configuration.getDataSet().getTableName() + "` LIMIT 0")
+                    + configuration.getDataSet().getTableName() + "`")
                     .setUseLegacySql(false).build();
             Job job = bigQuery.create(JobInfo.newBuilder(queryConfig).setJobId(getNewUniqueJobId(bigQuery)).build());
             try {
