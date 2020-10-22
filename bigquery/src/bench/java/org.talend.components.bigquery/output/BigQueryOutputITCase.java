@@ -22,6 +22,7 @@ import org.talend.components.bigquery.BigQueryTestUtil;
 import org.talend.components.bigquery.dataset.TableDataSet;
 import org.talend.components.bigquery.datastore.BigQueryConnection;
 import org.talend.sdk.component.api.record.Record;
+import org.talend.sdk.component.api.record.Schema;
 import org.talend.sdk.component.api.service.Service;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
 import org.talend.sdk.component.junit.BaseComponentsHandler;
@@ -135,6 +136,41 @@ public class BigQueryOutputITCase {
         List<Record> inputData = new ArrayList<>();
         inputData.add(rbf.newRecordBuilder().withString("k", "entry1").withString("v", "value1").build());
         inputData.add(rbf.newRecordBuilder().withString("k", "entry2").withString("v", "value2").build());
+
+        COMPONENTS.setInputData(inputData);
+
+        Job.components().component("source", "test://emitter").component("output", "BigQuery://BigQueryOutput?" + configURI)
+                .connections().from("source").to("output").build().run();
+
+    }
+
+    @Test
+    public void overrideData() {
+
+        BigQueryConnection connection = BigQueryTestUtil.getConnection();
+
+        TableDataSet dataset = new TableDataSet();
+        dataset.setConnection(connection);
+        dataset.setBqDataset("onimych");
+        dataset.setTableName("persons");
+
+        BigQueryOutputConfig config = new BigQueryOutputConfig();
+        config.setDataSet(dataset);
+        config.setTableOperation(BigQueryOutputConfig.TableOperation.TRUNCATE);
+
+        String configURI = configurationByExample().forInstance(config).configured().toQueryString();
+
+        List<Record> inputData = new ArrayList<>();
+
+        Schema schema = rbf.newSchemaBuilder(Schema.Type.RECORD)
+                .withEntry(rbf.newEntryBuilder().withName("field0").withType(Schema.Type.STRING).build())
+                .withEntry(rbf.newEntryBuilder().withName("field1").withType(Schema.Type.STRING).build())
+                .build();
+
+        inputData.add(rbf.newRecordBuilder(schema).withString("field0", "entry3").withString("field1", "value3").build());
+        inputData.add(rbf.newRecordBuilder(schema).withString("field0", "entry4").withString("field1", "value4").build());
+        inputData.add(rbf.newRecordBuilder(schema).withString("field0", "entry5").withString("field1", "value5").build());
+
 
         COMPONENTS.setInputData(inputData);
 
