@@ -87,9 +87,9 @@ public class BigQueryOutput implements Serializable {
                 throw new BigQueryConnectorException(i18n.infoTableNoExists(
                         configuration.getDataSet().getBqDataset() + "." + configuration.getDataSet().getTableName()));
             }
-            QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder("TRUNCATE TABLE  `"
-                    + connection.getProjectName() + "." + configuration.getDataSet().getBqDataset() + "."
-                    + configuration.getDataSet().getTableName() + "`")
+            QueryJobConfiguration queryConfig = QueryJobConfiguration
+                    .newBuilder("TRUNCATE TABLE  `" + connection.getProjectName() + "."
+                            + configuration.getDataSet().getBqDataset() + "." + configuration.getDataSet().getTableName() + "`")
                     .setUseLegacySql(false).build();
             Job job = bigQuery.create(JobInfo.newBuilder(queryConfig).setJobId(getNewUniqueJobId(bigQuery)).build());
             try {
