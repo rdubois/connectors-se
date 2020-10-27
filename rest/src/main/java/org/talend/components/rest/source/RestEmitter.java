@@ -32,7 +32,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 @Version(1)
-@Icon(value = Icon.IconType.CUSTOM, custom = "talend-rest")
+@Icon(value = Icon.IconType.CUSTOM, custom = "rest")
 @Emitter(name = "Input")
 @Documentation("Http REST Input component")
 @Pollable(name = "Polling", resumeMethod = "resume")
