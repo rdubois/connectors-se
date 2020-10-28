@@ -98,7 +98,7 @@ public class BigQueryOutput implements Serializable {
                 log.warn(i18n.errorQueryExecution(), e);
             }
             if (job.isDone()) {
-                log.info("Truncate query successfully completed");
+                log.info(i18n.infoQueryDone());
             }
         }
 
