@@ -39,6 +39,11 @@
             <artifactId>jackson-core-asl</artifactId>
             <version>${jackson-codehaus.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>stream-avro</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
 
         <!-- Tests -->
