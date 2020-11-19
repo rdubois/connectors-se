@@ -1,0 +1,6 @@
+{
+  "org.talend.components.common.stream.api.AvroConfig": {
+    "reader": "org.talend.components.common.stream.api.reader.AvroReaderSupplier",
+    "writer": "org.talend.components.common.stream.api.writer.AvroWriterSupplier"
+  }
+}
