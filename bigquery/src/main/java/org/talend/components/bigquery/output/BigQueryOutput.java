@@ -153,12 +153,14 @@ public class BigQueryOutput implements Serializable {
     @BeforeGroup
     public void beforeGroup() {
         records = new ArrayList<>();
-        Blob blob = getNewBlob();
-        WriteChannel writer = blob.writer();
-        try {
-            recordWriter = buildWriter(writer);
-        } catch (IOException e) {
-            log.warn(e.getMessage());
+        if (BigQueryOutputConfig.TableOperation.TRUNCATE == configuration.getTableOperation()) {
+            Blob blob = getNewBlob();
+            WriteChannel writer = blob.writer();
+            try {
+                recordWriter = buildWriter(writer);
+            } catch (IOException e) {
+                log.warn(e.getMessage());
+            }
         }
     }
 
@@ -304,12 +306,14 @@ public class BigQueryOutput implements Serializable {
 
     @PreDestroy
     public void release() {
-        try {
-            if (this.recordWriter != null) {
-                this.recordWriter.end();
+        if (BigQueryOutputConfig.TableOperation.TRUNCATE == configuration.getTableOperation()) {
+            try {
+                if (this.recordWriter != null) {
+                    this.recordWriter.end();
+                }
+            } catch (IOException ex) {
+                log.error(ex.getMessage());
             }
-        } catch (IOException ex) {
-            log.error(ex.getMessage());
         }
     }
 
