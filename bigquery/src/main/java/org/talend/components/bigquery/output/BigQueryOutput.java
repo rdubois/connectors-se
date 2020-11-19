@@ -41,8 +41,10 @@ import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.service.Service;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.UncheckedIOException;
 import java.nio.channels.Channels;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,13 +81,11 @@ public class BigQueryOutput implements Serializable {
 
     private BigQueryService service;
 
-    private JobId jobId;
-
     private GoogleStorageService storageService;
 
-    private Storage storage;
+    private transient Storage storage;
 
-    private RecordIORepository ioRepository;
+    private final RecordIORepository ioRepository;
 
     private RecordWriter recordWriter;
 
@@ -93,20 +93,48 @@ public class BigQueryOutput implements Serializable {
 
     private BlobInfo blobInfo;
 
-    public BigQueryOutput(@Option("configuration") final BigQueryOutputConfig configuration, BigQueryService bigQueryService, GoogleStorageService storageService, RecordIORepository ioRepository,
-                          I18nMessage i18n) {
+    public BigQueryOutput(@Option("configuration") final BigQueryOutputConfig configuration, BigQueryService bigQueryService, final GoogleStorageService storageService, RecordIORepository ioRepository,
+            I18nMessage i18n) {
         this.configuration = configuration;
         this.connection = configuration.getDataSet().getConnection();
         this.tableSchema = bigQueryService.guessSchema(configuration);
         this.service = bigQueryService;
-        this.jobId = getNewUniqueJobId();
         this.storageService = storageService;
         this.ioRepository = ioRepository;
         this.i18n = i18n;
+        truncateTableIfNeeded();
     }
 
-    private JobId getNewUniqueJobId() {
-        bigQuery = service.createClient(connection);
+    private void truncateTableIfNeeded() {
+        if (BigQueryOutputConfig.TableOperation.TRUNCATE == configuration.getTableOperation()) {
+            bigQuery = service.createClient(connection);
+            tableId = TableId.of(connection.getProjectName(), configuration.getDataSet().getBqDataset(),
+                    configuration.getDataSet().getTableName());
+            Table table = bigQuery.getTable(tableId);
+            if (table == null) {
+                throw new BigQueryConnectorException(i18n.infoTableNoExists(
+                        configuration.getDataSet().getBqDataset() + "." + configuration.getDataSet().getTableName()));
+            }
+            QueryJobConfiguration queryConfig = QueryJobConfiguration
+                    .newBuilder("TRUNCATE TABLE  `" + connection.getProjectName() + "."
+                            + configuration.getDataSet().getBqDataset() + "." + configuration.getDataSet().getTableName() + "`")
+                    .setUseLegacySql(false).build();
+            long time = System.currentTimeMillis();
+            Job job = bigQuery.create(JobInfo.newBuilder(queryConfig).setJobId(getNewUniqueJobId(bigQuery)).build());
+            long deleteTime = System.currentTimeMillis() - time;
+            log.info("BigQuery sql truncate request took " + deleteTime + " ms");
+            try {
+                job = job.waitFor();
+            } catch (InterruptedException e) {
+                log.warn(e.getMessage());
+            }
+            if (job.isDone()) {
+                log.info(i18n.infoQueryDone());
+            }
+        }
+    }
+
+    private JobId getNewUniqueJobId(BigQuery bigQuery) {
         JobId jobId;
         do {
             jobId = JobId.of(UUID.randomUUID().toString());
@@ -125,14 +153,12 @@ public class BigQueryOutput implements Serializable {
     @BeforeGroup
     public void beforeGroup() {
         records = new ArrayList<>();
-        if (BigQueryOutputConfig.TableOperation.TRUNCATE == configuration.getTableOperation()) {
-            Blob blob = getNewBlob();
-            WriteChannel writer = blob.writer();
-            try {
-                recordWriter = buildWriter(writer);
-            } catch (IOException e) {
-                log.warn(e.getMessage());
-            }
+        Blob blob = getNewBlob();
+        WriteChannel writer = blob.writer();
+        try {
+            recordWriter = buildWriter(writer);
+        } catch (IOException e) {
+            log.warn(e.getMessage());
         }
     }
 
@@ -256,27 +282,9 @@ public class BigQueryOutput implements Serializable {
             }
 
             String sourceUri = "gs://" + configuration.getDataSet().getGsBucket() + "/" + blobName;
-            LoadJobConfiguration loadConfig;
-            Job firstJob = bigQuery.getJob(jobId);
-            Job job;
-            if (firstJob == null) {
-                loadConfig = LoadJobConfiguration.builder(tableId, sourceUri)
-                        .setWriteDisposition(JobInfo.WriteDisposition.WRITE_TRUNCATE)
-                        .setFormatOptions(FormatOptions.avro())
-                        .build();
-                job = bigQuery.create(JobInfo.newBuilder(loadConfig).setJobId(jobId).build());
-            } else {
-                if (!firstJob.isDone()) {
-                    try {
-                        firstJob.waitFor();
-                    } catch (InterruptedException e) {
-                        log.warn(e.getMessage());
-                    }
-                }
-                loadConfig =
-                        LoadJobConfiguration.of(tableId, sourceUri, FormatOptions.avro());
-                job = bigQuery.create(JobInfo.of(loadConfig));
-            }
+            LoadJobConfiguration loadConfig =
+                    LoadJobConfiguration.of(tableId, sourceUri, FormatOptions.avro());
+            Job job = bigQuery.create(JobInfo.of(loadConfig));
             try {
                 job = job.waitFor();
             } catch (InterruptedException e) {
@@ -291,6 +299,17 @@ public class BigQueryOutput implements Serializable {
             }
 
             storage.delete(blobInfo.getBlobId());
+        }
+    }
+
+    @PreDestroy
+    public void release() {
+        try {
+            if (this.recordWriter != null) {
+                this.recordWriter.end();
+            }
+        } catch (IOException ex) {
+            log.error(ex.getMessage());
         }
     }
 

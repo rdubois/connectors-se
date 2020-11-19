@@ -69,7 +69,7 @@ public class BigQueryOutputConfig implements Serializable {
 
         /*
          * Currently not supported by Streams.
-         * 
+         *
          * /**
          * Specifies that tables should be dropped if exists, and create by the provided schema, which actually the
          * combine with TRUNCATE and CREATE_IF_NOT_EXISTS
