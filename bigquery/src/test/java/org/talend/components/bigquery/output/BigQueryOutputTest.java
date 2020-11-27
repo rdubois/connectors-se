@@ -19,7 +19,9 @@ import org.mockito.Mockito;
 import org.talend.components.bigquery.dataset.TableDataSet;
 import org.talend.components.bigquery.datastore.BigQueryConnection;
 import org.talend.components.bigquery.service.BigQueryService;
+import org.talend.components.bigquery.service.GoogleStorageService;
 import org.talend.components.bigquery.service.I18nMessage;
+import org.talend.components.common.stream.api.RecordIORepository;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
 import org.talend.sdk.component.junit5.WithComponents;
@@ -39,6 +41,10 @@ public class BigQueryOutputTest {
     private BigQuery bigQuery;
 
     private I18nMessage i18n;
+
+    private GoogleStorageService storageService;
+
+    private RecordIORepository ioRepository;
 
     @BeforeEach
     public void reinit() throws Exception {
@@ -60,6 +66,10 @@ public class BigQueryOutputTest {
         bigQuery = Mockito.mock(BigQuery.class);
         Mockito.when(service.createClient(connection)).thenReturn(bigQuery);
 
+        storageService = Mockito.mock(GoogleStorageService.class);
+
+        ioRepository = Mockito.mock(RecordIORepository.class);
+
         i18n = Mockito.mock(I18nMessage.class);
     }
 
@@ -74,7 +84,7 @@ public class BigQueryOutputTest {
         Mockito.when(table.getDefinition()).thenReturn(definition);
         Mockito.when(definition.getSchema()).thenReturn(Schema.of(getFields()));
 
-        BigQueryOutput beanUnderTest = new BigQueryOutput(configuration, service, i18n);
+        BigQueryOutput beanUnderTest = new BigQueryOutput(configuration, service, storageService, ioRepository, i18n);
         beanUnderTest.init();
 
         beanUnderTest.beforeGroup();

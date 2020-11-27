@@ -93,8 +93,8 @@ public class BigQueryOutput implements Serializable {
 
     private BlobInfo blobInfo;
 
-    public BigQueryOutput(@Option("configuration") final BigQueryOutputConfig configuration, BigQueryService bigQueryService, final GoogleStorageService storageService, RecordIORepository ioRepository,
-            I18nMessage i18n) {
+    public BigQueryOutput(@Option("configuration") final BigQueryOutputConfig configuration, BigQueryService bigQueryService,
+            final GoogleStorageService storageService, RecordIORepository ioRepository, I18nMessage i18n) {
         this.configuration = configuration;
         this.connection = configuration.getDataSet().getConnection();
         this.tableSchema = bigQueryService.guessSchema(configuration);
@@ -284,8 +284,7 @@ public class BigQueryOutput implements Serializable {
             }
 
             String sourceUri = "gs://" + configuration.getDataSet().getGsBucket() + "/" + blobName;
-            LoadJobConfiguration loadConfig =
-                    LoadJobConfiguration.of(tableId, sourceUri, FormatOptions.avro());
+            LoadJobConfiguration loadConfig = LoadJobConfiguration.of(tableId, sourceUri, FormatOptions.avro());
             Job job = bigQuery.create(JobInfo.of(loadConfig));
             try {
                 job = job.waitFor();
@@ -295,9 +294,7 @@ public class BigQueryOutput implements Serializable {
             if (job.isDone()) {
                 log.info("Avro from GCS successfully loaded in a table");
             } else {
-                log.warn(
-                        "BigQuery was unable to load into the table due to an error:"
-                                + job.getStatus().getError());
+                log.warn("BigQuery was unable to load into the table due to an error:" + job.getStatus().getError());
             }
 
             storage.delete(blobInfo.getBlobId());
