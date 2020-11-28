@@ -124,10 +124,16 @@ public class BigQueryOutput implements Serializable {
     public void beforeGroup() {
         records = new ArrayList<>();
         if (BigQueryOutputConfig.TableOperation.TRUNCATE == configuration.getTableOperation()) {
+            long startTime = System.currentTimeMillis();
             Blob blob = getNewBlob();
+            long endTime = System.currentTimeMillis() - startTime;
+            log.info("Create blob took " + endTime + " ms");
             WriteChannel writer = blob.writer();
             try {
+                long startTime1 = System.currentTimeMillis();
                 recordWriter = buildWriter(writer);
+                long endTime1 = System.currentTimeMillis() - startTime1;
+                log.info("Build csv writer took " + endTime1 + " ms");
             } catch (IOException e) {
                 log.warn(e.getMessage());
             }
@@ -241,8 +247,11 @@ public class BigQueryOutput implements Serializable {
         if (BigQueryOutputConfig.TableOperation.TRUNCATE == configuration.getTableOperation()) {
 
             try {
+                long startTime = System.currentTimeMillis();
                 this.recordWriter.add(records);
                 this.recordWriter.end();
+                long endTime = System.currentTimeMillis() - startTime;
+                log.info("load data to the gs took " + endTime + " ms");
             } catch (IOException exIO) {
                 log.error(exIO.getMessage());
             }
@@ -251,8 +260,7 @@ public class BigQueryOutput implements Serializable {
             Table table = bigQuery.getTable(tableId);
             Schema schema = table.getDefinition().getSchema();
             LoadJobConfiguration.Builder loadConfigurationBuilder = LoadJobConfiguration.newBuilder(tableId, sourceUri)
-                    .setFormatOptions(FormatOptions.csv())
-                    .setSchema(schema);
+                    .setFormatOptions(FormatOptions.csv()).setSchema(schema);
             Job firstJob = bigQuery.getJob(jobId);
             JobInfo jobInfo;
             if (firstJob == null) {
@@ -268,9 +276,12 @@ public class BigQueryOutput implements Serializable {
                 }
                 jobInfo = JobInfo.of(loadConfigurationBuilder.build());
             }
+            long startTime = System.currentTimeMillis();
             Job job = bigQuery.create(jobInfo);
             try {
                 job = job.waitFor();
+                long endTime = System.currentTimeMillis() - startTime;
+                log.info("Load data from gs to bq took " + endTime + " ms");
             } catch (InterruptedException e) {
                 log.warn(e.getMessage());
             }
@@ -279,7 +290,10 @@ public class BigQueryOutput implements Serializable {
             } else {
                 log.warn("BigQuery was unable to load into the table due to an error:" + job.getStatus().getError());
             }
+            long startTime3 = System.currentTimeMillis();
             storage.delete(blobInfo.getBlobId());
+            long endTime3 = System.currentTimeMillis() - startTime3;
+            log.info("Delete blob took " + endTime3 + " ms");
         }
     }
 
