@@ -77,69 +77,68 @@ public class BigQueryOutputITCase {
 
         TableDataSet dataset = new TableDataSet();
         dataset.setConnection(connection);
-        dataset.setBqDataset("dataset_rlecomte");
-        dataset.setTableName("TableWithData");
+        dataset.setBqDataset("onimych");
+        dataset.setTableName("person");
 
         BigQueryOutputConfig config = new BigQueryOutputConfig();
         config.setDataSet(dataset);
 
         String configURI = configurationByExample().forInstance(config).configured().toQueryString();
 
-        final int nbrecords = 1_000;
+//        final int nbrecords = 1_000;
 
-        Iterable<Record> inputData = new RandomDataGenerator(nbrecords, rbf);
+//        Iterable<Record> inputData = new RandomDataGenerator(nbrecords, rbf);
+
+        List<Record> inputData = new ArrayList<>();
+
+        Schema schema = rbf.newSchemaBuilder(Schema.Type.RECORD)
+                .withEntry(rbf.newEntryBuilder().withName("field0").withType(Schema.Type.STRING).build())
+                .withEntry(rbf.newEntryBuilder().withName("field1").withType(Schema.Type.STRING).build())
+                .build();
+
+        inputData.add(rbf.newRecordBuilder(schema).withString("field0", "entry1").withString("field1", "value1").build());
+        inputData.add(rbf.newRecordBuilder(schema).withString("field0", "entry2").withString("field1", "value2").build());
+
 
         COMPONENTS.setInputData(inputData);
 
-        long start = System.currentTimeMillis();
+//        long start = System.currentTimeMillis();
 
         Job.components().component("source", "test://emitter").component("output", "BigQuery://BigQueryOutput?" + configURI)
                 .connections().from("source").to("output").build().run();
 
-        long end = System.currentTimeMillis();
-
-        System.out.println(nbrecords + " in " + (end - start) + " ms");
+//        long end = System.currentTimeMillis();
+//
+//        System.out.println(nbrecords + " in " + (end - start) + " ms");
 
     }
 
     @Test
     public void run() {
 
-        String jsonCredentials = "";
-        try (FileInputStream in = new FileInputStream("C:\\Users\\rlecomte\\Documents\\Engineering-4e7ac6cf93f4.json");
-                BufferedInputStream bIn = new BufferedInputStream(in)) {
-            byte[] buffer = new byte[1024];
-            int read = 0;
-            while ((read = bIn.read(buffer)) > 0) {
-                jsonCredentials += new String(buffer, 0, read, StandardCharsets.UTF_8);
-            }
-            jsonCredentials = jsonCredentials.replace("\n", " ").trim();
-        } catch (IOException ioe) {
-            Assertions.fail(ioe);
-        }
-
-        BigQueryConnection connection = new BigQueryConnection();
-        connection.setProjectName("engineering-152721");
-        connection.setJsonCredentials(jsonCredentials);
+        BigQueryConnection connection = BigQueryTestUtil.getConnection();
 
         TableDataSet dataset = new TableDataSet();
         dataset.setConnection(connection);
-        dataset.setBqDataset("dataset_rlecomte");
-        dataset.setTableName("OutputTest");
+        dataset.setBqDataset("onimych");
+        dataset.setTableName("person");
 
         BigQueryOutputConfig config = new BigQueryOutputConfig();
         config.setDataSet(dataset);
         config.setTableOperation(BigQueryOutputConfig.TableOperation.CREATE_IF_NOT_EXISTS);
-        String schema = "[\r\n{\"name\":\"k\", \"type\":\"STRING\"},\r\n{\"name\":\"v\", \"type\":\"STRING\"}\r\n]";
-        System.out.println(schema);
-        config.setTableSchemaFields(schema);
 
         String configURI = configurationByExample().forInstance(config).configured().toQueryString();
-        System.out.println(configURI);
 
         List<Record> inputData = new ArrayList<>();
-        inputData.add(rbf.newRecordBuilder().withString("k", "entry1").withString("v", "value1").build());
-        inputData.add(rbf.newRecordBuilder().withString("k", "entry2").withString("v", "value2").build());
+
+        Schema schema = rbf.newSchemaBuilder(Schema.Type.RECORD)
+                .withEntry(rbf.newEntryBuilder().withName("field0").withType(Schema.Type.STRING).build())
+                .withEntry(rbf.newEntryBuilder().withName("field1").withType(Schema.Type.STRING).build())
+                .build();
+
+        inputData.add(rbf.newRecordBuilder(schema).withString("field0", "Chester").withString("field1", "Washington").build());
+        inputData.add(rbf.newRecordBuilder(schema).withString("field0", "Herbert").withString("field1", "Buchanan").build());
+
 
         COMPONENTS.setInputData(inputData);
 

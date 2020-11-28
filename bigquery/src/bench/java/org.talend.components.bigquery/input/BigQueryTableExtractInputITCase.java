@@ -33,7 +33,7 @@ import org.talend.sdk.component.junit.environment.builtin.beam.SparkRunnerEnviro
 import org.talend.sdk.component.junit5.Injected;
 import org.talend.sdk.component.junit5.WithComponents;
 import org.talend.sdk.component.junit5.environment.EnvironmentalTest;
-import org.talend.sdk.component.runtime.beam.TalendIO;
+//import org.talend.sdk.component.runtime.beam.TalendIO;
 import org.talend.sdk.component.runtime.input.Mapper;
 
 import java.io.BufferedInputStream;
@@ -122,9 +122,9 @@ public class BigQueryTableExtractInputITCase {
 
         long start = System.currentTimeMillis();
         Mapper mapper = handler.createMapper(BigQueryTableExtractMapper.class, config);
-        Pipeline.create(
-                PipelineOptionsFactory.fromArgs("--runner=org.apache.beam.runners.spark.SparkRunner", "--filesToStage=").create())
-                .apply(TalendIO.read(mapper)).apply(ParDo.of(counter)).getPipeline().run().waitUntilFinish();
+//        Pipeline.create(
+//                PipelineOptionsFactory.fromArgs("--runner=org.apache.beam.runners.spark.SparkRunner", "--filesToStage=").create())
+//                .apply(TalendIO.read(mapper)).apply(ParDo.of(counter)).getPipeline().run().waitUntilFinish();
 
         long end = System.currentTimeMillis();
 

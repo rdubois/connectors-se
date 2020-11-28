@@ -31,13 +31,9 @@ public class BigQueryTestUtil {
     public static String GOOGLE_PROJECT;
 
     static {
-        GOOGLE_APPLICATION_CREDENTIALS = Optional.ofNullable(System.getProperty("GOOGLE_APPLICATION_CREDENTIALS"))
-                .orElseGet(() -> Optional.ofNullable(System.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
-                        .orElseGet(() -> Optional.ofNullable(new MavenDecrypter().find("GOOGLE_APPLICATION_CREDENTIALS").getPassword())
-                                .orElseThrow(() -> new RuntimeException("GOOGLE_APPLICATION_CREDENTIALS not set"))));
+        GOOGLE_APPLICATION_CREDENTIALS = "D:/Talend/Jira/TDI-42951/engineering-152721-3d0c7f2c38ca.json";
 
-        GOOGLE_PROJECT = Optional.ofNullable(System.getProperty("GOOGLE_PROJECT")).orElse("engineering-152721");
-        log.debug("Using " + GOOGLE_APPLICATION_CREDENTIALS + " as Google credentials file");
+        GOOGLE_PROJECT = "engineering-152721";
     }
 
     public static BigQueryConnection getConnection() {
