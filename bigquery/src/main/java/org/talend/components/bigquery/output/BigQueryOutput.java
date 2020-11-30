@@ -81,15 +81,15 @@ public class BigQueryOutput implements Serializable {
 
     private GoogleStorageService storageService;
 
-    private Storage storage;
+    private transient Storage storage;
 
     private RecordIORepository ioRepository;
 
-    private RecordWriter recordWriter;
+    private transient RecordWriter recordWriter;
 
-    private String blobName;
+    private transient String blobName;
 
-    private BlobInfo blobInfo;
+    private transient BlobInfo blobInfo;
 
     public BigQueryOutput(@Option("configuration") final BigQueryOutputConfig configuration, BigQueryService bigQueryService,
             GoogleStorageService storageService, RecordIORepository ioRepository, I18nMessage i18n) {
