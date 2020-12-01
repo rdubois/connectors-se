@@ -40,7 +40,6 @@ import org.talend.sdk.component.api.processor.Processor;
 import org.talend.sdk.component.api.record.Record;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.channels.Channels;
@@ -179,6 +178,103 @@ public class BigQueryOutput implements Serializable {
         }
     }
 
+    private void createTableIfNotExist() {
+        try {
+            Table table = bigQuery.getTable(tableId);
+            if (table == null) {
+                log.info(i18n.infoTableNoExists(configuration.getDataSet().getBqDataset() + "." + tableId.getTable()));
+                TableInfo tableInfo = TableInfo.newBuilder(tableId, StandardTableDefinition.of(tableSchema)).build();
+                bigQuery.create(tableInfo);
+                log.info(i18n.infoTableCreated(tableId.getTable()));
+            }
+        } catch (BigQueryException e) {
+            log.warn(i18n.errorCreationTable() + e.getMessage(), e);
+
+        }
+    }
+
+    private void streamData() {
+        TacoKitRecordToTableRowConverter converter = new TacoKitRecordToTableRowConverter(tableSchema, i18n);
+
+        int nbRecordsToSend = records.size();
+        int nbRecordsSent = 0;
+        List<Map<String, ?>> recordsBuffer = new ArrayList<>();
+        while (nbRecordsSent < nbRecordsToSend) {
+            recordsBuffer.clear();
+            records.stream().skip(nbRecordsSent).limit(MAX_BATCH_SIZE).map(converter::apply).forEach(recordsBuffer::add);
+            InsertAllRequest.Builder insertAllRequestBuilder = InsertAllRequest.newBuilder(tableId);
+            recordsBuffer.stream().forEach(insertAllRequestBuilder::addRow);
+            InsertAllResponse response = bigQuery.insertAll(insertAllRequestBuilder.build());
+            if (response.hasErrors()) {
+                // response.getInsertErrors();
+                // rejected no handled by TCK
+                log.warn(i18n.warnRejected(response.getInsertErrors().size()));
+                // log errors for first row
+                response.getInsertErrors().values().iterator().next().stream().forEach(e -> log.warn(e.getMessage()));
+                if (response.getInsertErrors().size() == recordsBuffer.size()) {
+                    // All rows were rejected : there's an issue with schema ?
+                    log.warn(records.get(0).getSchema().toString());
+                    log.warn(tableSchema.toString());
+                    // Let's show how the first record was handled.
+                    log.warn(records.get(nbRecordsSent).toString());
+                    log.warn(recordsBuffer.get(0).toString());
+                }
+            }
+            nbRecordsSent += recordsBuffer.size();
+        }
+    }
+
+    private void loadData() {
+        try {
+            long startTime = System.currentTimeMillis();
+            this.recordWriter.add(records);
+            this.recordWriter.end();
+            long endTime = System.currentTimeMillis() - startTime;
+            log.info("load data to the gs took " + endTime + " ms");
+        } catch (IOException exIO) {
+            log.error(exIO.getMessage());
+        }
+
+        String sourceUri = "gs://" + configuration.getDataSet().getGsBucket() + "/" + blobName;
+        Table table = bigQuery.getTable(tableId);
+        Schema schema = table.getDefinition().getSchema();
+        LoadJobConfiguration.Builder loadConfigurationBuilder = LoadJobConfiguration.newBuilder(tableId, sourceUri)
+                .setFormatOptions(FormatOptions.csv()).setSchema(schema);
+        Job firstJob = bigQuery.getJob(jobId);
+        JobInfo jobInfo;
+        if (firstJob == null) {
+            loadConfigurationBuilder.setWriteDisposition(JobInfo.WriteDisposition.WRITE_TRUNCATE);
+            jobInfo = JobInfo.newBuilder(loadConfigurationBuilder.build()).setJobId(jobId).build();
+        } else {
+            if (!firstJob.isDone()) {
+                try {
+                    firstJob.waitFor();
+                } catch (InterruptedException e) {
+                    log.warn(e.getMessage());
+                }
+            }
+            jobInfo = JobInfo.of(loadConfigurationBuilder.build());
+        }
+        long startTime = System.currentTimeMillis();
+        Job job = bigQuery.create(jobInfo);
+        try {
+            job = job.waitFor();
+            long endTime = System.currentTimeMillis() - startTime;
+            log.info("Load data from gs to bq took " + endTime + " ms");
+        } catch (InterruptedException e) {
+            log.warn(e.getMessage());
+        }
+        if (job.isDone()) {
+            log.info("CSV from GCS successfully loaded in a table");
+        } else {
+            log.warn("BigQuery was unable to load into the table due to an error:" + job.getStatus().getError());
+        }
+        long startTime3 = System.currentTimeMillis();
+        storage.delete(blobInfo.getBlobId());
+        long endTime3 = System.currentTimeMillis() - startTime3;
+        log.info("Delete blob took " + endTime3 + " ms");
+    }
+
     @AfterGroup
     public void afterGroup() {
 
@@ -187,19 +283,7 @@ public class BigQueryOutput implements Serializable {
             tableSchema = service.guessSchema(records.get(0));
 
             if (tableSchema != null) {
-                try {
-                    Table table = bigQuery.getTable(tableId);
-                    if (table == null) {
-                        log.info(i18n.infoTableNoExists(
-                                configuration.getDataSet().getBqDataset() + "." + configuration.getDataSet().getTableName()));
-                        TableInfo tableInfo = TableInfo.newBuilder(tableId, StandardTableDefinition.of(tableSchema)).build();
-                        table = bigQuery.create(tableInfo);
-                        log.info(i18n.infoTableCreated(tableId.getTable()));
-                    }
-                } catch (BigQueryException e) {
-                    log.warn(i18n.errorCreationTable() + e.getMessage(), e);
-
-                }
+                createTableIfNotExist();
             }
             if (tableSchema == null) {
                 // Retry reading table metadata, in case another worker created if meanwhile
@@ -211,90 +295,9 @@ public class BigQueryOutput implements Serializable {
         }
 
         if (BigQueryOutputConfig.TableOperation.TRUNCATE == configuration.getTableOperation()) {
-
-            try {
-                long startTime = System.currentTimeMillis();
-                this.recordWriter.add(records);
-                this.recordWriter.end();
-                long endTime = System.currentTimeMillis() - startTime;
-                log.info("load data to the gs took " + endTime + " ms");
-            } catch (IOException exIO) {
-                log.error(exIO.getMessage());
-            }
-
-            String sourceUri = "gs://" + configuration.getDataSet().getGsBucket() + "/" + blobName;
-            Table table = bigQuery.getTable(tableId);
-            Schema schema = table.getDefinition().getSchema();
-            LoadJobConfiguration.Builder loadConfigurationBuilder = LoadJobConfiguration.newBuilder(tableId, sourceUri)
-                    .setFormatOptions(FormatOptions.csv()).setSchema(schema);
-            Job firstJob = bigQuery.getJob(jobId);
-            JobInfo jobInfo;
-            if (firstJob == null) {
-                loadConfigurationBuilder.setWriteDisposition(JobInfo.WriteDisposition.WRITE_TRUNCATE);
-                jobInfo = JobInfo.newBuilder(loadConfigurationBuilder.build()).setJobId(jobId).build();
-            } else {
-                if (!firstJob.isDone()) {
-                    try {
-                        firstJob.waitFor();
-                    } catch (InterruptedException e) {
-                        log.warn(e.getMessage());
-                    }
-                }
-                jobInfo = JobInfo.of(loadConfigurationBuilder.build());
-            }
-            long startTime = System.currentTimeMillis();
-            Job job = bigQuery.create(jobInfo);
-            try {
-                job = job.waitFor();
-                long endTime = System.currentTimeMillis() - startTime;
-                log.info("Load data from gs to bq took " + endTime + " ms");
-            } catch (InterruptedException e) {
-                log.warn(e.getMessage());
-            }
-            if (job.isDone()) {
-                log.info("CSV from GCS successfully loaded in a table");
-            } else {
-                log.warn("BigQuery was unable to load into the table due to an error:" + job.getStatus().getError());
-            }
-            long startTime3 = System.currentTimeMillis();
-            storage.delete(blobInfo.getBlobId());
-            long endTime3 = System.currentTimeMillis() - startTime3;
-            log.info("Delete blob took " + endTime3 + " ms");
-
+            loadData();
         } else {
-            TacoKitRecordToTableRowConverter converter = new TacoKitRecordToTableRowConverter(tableSchema, i18n);
-
-            int nbRecordsToSend = records.size();
-            int nbRecordsSent = 0;
-            List<Map<String, ?>> recordsBuffer = new ArrayList<>();
-
-            while (nbRecordsSent < nbRecordsToSend) {
-
-                recordsBuffer.clear();
-                records.stream().skip(nbRecordsSent).limit(MAX_BATCH_SIZE).map(converter::apply).forEach(recordsBuffer::add);
-
-                InsertAllRequest.Builder insertAllRequestBuilder = InsertAllRequest.newBuilder(tableId);
-                recordsBuffer.stream().forEach(insertAllRequestBuilder::addRow);
-                InsertAllResponse response = bigQuery.insertAll(insertAllRequestBuilder.build());
-
-                if (response.hasErrors()) {
-                    // response.getInsertErrors();
-                    // rejected no handled by TCK
-                    log.warn(i18n.warnRejected(response.getInsertErrors().size()));
-                    // log errors for first row
-                    response.getInsertErrors().values().iterator().next().stream().forEach(e -> log.warn(e.getMessage()));
-                    if (response.getInsertErrors().size() == recordsBuffer.size()) {
-                        // All rows were rejected : there's an issue with schema ?
-                        log.warn(records.get(0).getSchema().toString());
-                        log.warn(tableSchema.toString());
-                        // Let's show how the first record was handled.
-                        log.warn(records.get(nbRecordsSent).toString());
-                        log.warn(recordsBuffer.get(0).toString());
-                    }
-                }
-
-                nbRecordsSent += recordsBuffer.size();
-            }
+            streamData();
         }
     }
 

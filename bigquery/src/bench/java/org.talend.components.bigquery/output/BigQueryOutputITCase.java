@@ -70,6 +70,8 @@ public class BigQueryOutputITCase {
 
     @Test
     public void fillData() {
+        int batchSize = 1000;
+
         BigQueryConnection connection = BigQueryTestUtil.getConnection();
 
         TableDataSet dataset = new TableDataSet();
@@ -81,6 +83,7 @@ public class BigQueryOutputITCase {
         config.setDataSet(dataset);
 
         String configURI = configurationByExample().forInstance(config).configured().toQueryString();
+        configURI += "&$configuration.$maxBatchSize=" + batchSize;
 
 //        final int nbrecords = 1_000;
 
@@ -91,10 +94,11 @@ public class BigQueryOutputITCase {
         Schema schema = rbf.newSchemaBuilder(Schema.Type.RECORD)
                 .withEntry(rbf.newEntryBuilder().withName("field0").withType(Schema.Type.STRING).build())
                 .withEntry(rbf.newEntryBuilder().withName("field1").withType(Schema.Type.STRING).build())
+                .withEntry(rbf.newEntryBuilder().withName("field2").withType(Schema.Type.STRING).build())
+                .withEntry(rbf.newEntryBuilder().withName("field3").withType(Schema.Type.STRING).build())
                 .build();
 
-        inputData.add(rbf.newRecordBuilder(schema).withString("field0", "entry1").withString("field1", "value1").build());
-        inputData.add(rbf.newRecordBuilder(schema).withString("field0", "entry2").withString("field1", "value2").build());
+        fillInputData(inputData, schema);
 
 
         COMPONENTS.setInputData(inputData);
