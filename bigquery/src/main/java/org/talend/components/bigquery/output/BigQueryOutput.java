@@ -210,40 +210,6 @@ public class BigQueryOutput implements Serializable {
             }
         }
 
-        TacoKitRecordToTableRowConverter converter = new TacoKitRecordToTableRowConverter(tableSchema, i18n);
-
-        int nbRecordsToSend = records.size();
-        int nbRecordsSent = 0;
-        List<Map<String, ?>> recordsBuffer = new ArrayList<>();
-
-        while (nbRecordsSent < nbRecordsToSend) {
-
-            recordsBuffer.clear();
-            records.stream().skip(nbRecordsSent).limit(MAX_BATCH_SIZE).map(converter::apply).forEach(recordsBuffer::add);
-
-            InsertAllRequest.Builder insertAllRequestBuilder = InsertAllRequest.newBuilder(tableId);
-            recordsBuffer.stream().forEach(insertAllRequestBuilder::addRow);
-            InsertAllResponse response = bigQuery.insertAll(insertAllRequestBuilder.build());
-
-            if (response.hasErrors()) {
-                // response.getInsertErrors();
-                // rejected no handled by TCK
-                log.warn(i18n.warnRejected(response.getInsertErrors().size()));
-                // log errors for first row
-                response.getInsertErrors().values().iterator().next().stream().forEach(e -> log.warn(e.getMessage()));
-                if (response.getInsertErrors().size() == recordsBuffer.size()) {
-                    // All rows were rejected : there's an issue with schema ?
-                    log.warn(records.get(0).getSchema().toString());
-                    log.warn(tableSchema.toString());
-                    // Let's show how the first record was handled.
-                    log.warn(records.get(nbRecordsSent).toString());
-                    log.warn(recordsBuffer.get(0).toString());
-                }
-            }
-
-            nbRecordsSent += recordsBuffer.size();
-        }
-
         if (BigQueryOutputConfig.TableOperation.TRUNCATE == configuration.getTableOperation()) {
 
             try {
@@ -294,6 +260,41 @@ public class BigQueryOutput implements Serializable {
             storage.delete(blobInfo.getBlobId());
             long endTime3 = System.currentTimeMillis() - startTime3;
             log.info("Delete blob took " + endTime3 + " ms");
+
+        } else {
+            TacoKitRecordToTableRowConverter converter = new TacoKitRecordToTableRowConverter(tableSchema, i18n);
+
+            int nbRecordsToSend = records.size();
+            int nbRecordsSent = 0;
+            List<Map<String, ?>> recordsBuffer = new ArrayList<>();
+
+            while (nbRecordsSent < nbRecordsToSend) {
+
+                recordsBuffer.clear();
+                records.stream().skip(nbRecordsSent).limit(MAX_BATCH_SIZE).map(converter::apply).forEach(recordsBuffer::add);
+
+                InsertAllRequest.Builder insertAllRequestBuilder = InsertAllRequest.newBuilder(tableId);
+                recordsBuffer.stream().forEach(insertAllRequestBuilder::addRow);
+                InsertAllResponse response = bigQuery.insertAll(insertAllRequestBuilder.build());
+
+                if (response.hasErrors()) {
+                    // response.getInsertErrors();
+                    // rejected no handled by TCK
+                    log.warn(i18n.warnRejected(response.getInsertErrors().size()));
+                    // log errors for first row
+                    response.getInsertErrors().values().iterator().next().stream().forEach(e -> log.warn(e.getMessage()));
+                    if (response.getInsertErrors().size() == recordsBuffer.size()) {
+                        // All rows were rejected : there's an issue with schema ?
+                        log.warn(records.get(0).getSchema().toString());
+                        log.warn(tableSchema.toString());
+                        // Let's show how the first record was handled.
+                        log.warn(records.get(nbRecordsSent).toString());
+                        log.warn(recordsBuffer.get(0).toString());
+                    }
+                }
+
+                nbRecordsSent += recordsBuffer.size();
+            }
         }
     }
 

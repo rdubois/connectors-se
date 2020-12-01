@@ -37,20 +37,17 @@ import org.talend.sdk.component.junit5.WithComponents;
 import org.talend.sdk.component.junit5.environment.EnvironmentalTest;
 import org.talend.sdk.component.runtime.manager.chain.Job;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.talend.sdk.component.junit.SimpleFactory.configurationByExample;
 
 @WithComponents(value = "org.talend.components.bigquery")
 public class BigQueryOutputITCase {
+
+    public static final String COMMA_DELIMITER = ";";
 
     @Service
     public RecordBuilderFactory rbf;
@@ -102,19 +99,20 @@ public class BigQueryOutputITCase {
 
         COMPONENTS.setInputData(inputData);
 
-//        long start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
 
         Job.components().component("source", "test://emitter").component("output", "BigQuery://BigQueryOutput?" + configURI)
                 .connections().from("source").to("output").build().run();
 
-//        long end = System.currentTimeMillis();
-//
-//        System.out.println(nbrecords + " in " + (end - start) + " ms");
+        long end =  System.currentTimeMillis() - start;
+
+        System.out.println("Append job run took " + end + " ms");
 
     }
 
     @Test
     public void run() {
+        int batchSize = 1000;
 
         BigQueryConnection connection = BigQueryTestUtil.getConnection();
 
@@ -128,28 +126,39 @@ public class BigQueryOutputITCase {
         config.setTableOperation(BigQueryOutputConfig.TableOperation.CREATE_IF_NOT_EXISTS);
 
         String configURI = configurationByExample().forInstance(config).configured().toQueryString();
+        configURI += "&$configuration.$maxBatchSize=" + batchSize;
 
         List<Record> inputData = new ArrayList<>();
 
         Schema schema = rbf.newSchemaBuilder(Schema.Type.RECORD)
                 .withEntry(rbf.newEntryBuilder().withName("field0").withType(Schema.Type.STRING).build())
                 .withEntry(rbf.newEntryBuilder().withName("field1").withType(Schema.Type.STRING).build())
+                .withEntry(rbf.newEntryBuilder().withName("field2").withType(Schema.Type.STRING).build())
+                .withEntry(rbf.newEntryBuilder().withName("field3").withType(Schema.Type.STRING).build())
                 .build();
 
-        inputData.add(rbf.newRecordBuilder(schema).withString("field0", "Chester").withString("field1", "Washington").build());
-        inputData.add(rbf.newRecordBuilder(schema).withString("field0", "Herbert").withString("field1", "Buchanan").build());
+
+        fillInputData(inputData, schema);
 
 
         COMPONENTS.setInputData(inputData);
 
+        long start = System.currentTimeMillis();
+
+
         Job.components().component("source", "test://emitter").component("output", "BigQuery://BigQueryOutput?" + configURI)
                 .connections().from("source").to("output").build().run();
+
+        long end =  System.currentTimeMillis() - start;
+
+        System.out.println("CreateIfNotExist job run took " + end + " ms");
+
 
     }
 
     @Test
     public void overrideData() {
-        int batchSize = 3;
+        int batchSize = 1000;
 
         BigQueryConnection connection = BigQueryTestUtil.getConnection();
 
@@ -171,19 +180,57 @@ public class BigQueryOutputITCase {
         Schema schema = rbf.newSchemaBuilder(Schema.Type.RECORD)
                 .withEntry(rbf.newEntryBuilder().withName("field0").withType(Schema.Type.STRING).build())
                 .withEntry(rbf.newEntryBuilder().withName("field1").withType(Schema.Type.STRING).build())
+                .withEntry(rbf.newEntryBuilder().withName("field2").withType(Schema.Type.STRING).build())
+                .withEntry(rbf.newEntryBuilder().withName("field3").withType(Schema.Type.STRING).build())
                 .build();
 
-        inputData.add(rbf.newRecordBuilder(schema).withString("field0", "entry3").withString("field1", "value3").build());
-        inputData.add(rbf.newRecordBuilder(schema).withString("field0", "entry4").withString("field1", "value4").build());
-        inputData.add(rbf.newRecordBuilder(schema).withString("field0", "entry5").withString("field1", "value5").build());
-        inputData.add(rbf.newRecordBuilder(schema).withString("field0", "entry6").withString("field1", "value6").build());
-        inputData.add(rbf.newRecordBuilder(schema).withString("field0", "entry7").withString("field1", "value7").build());
-        inputData.add(rbf.newRecordBuilder(schema).withString("field0", "entry8").withString("field1", "value8").build());
-
+        fillInputData(inputData, schema);
 
         COMPONENTS.setInputData(inputData);
 
+        long start = System.currentTimeMillis();
+
         Job.components().component("source", "test://emitter").component("output", "BigQuery://BigQueryOutput?" + configURI)
                 .connections().from("source").to("output").build().run();
+
+        long end =  System.currentTimeMillis() - start;
+
+        System.out.println("Truncate job run took " + end + " ms");
+
     }
+
+    private void fillInputData(List<Record> inputData, Schema schema) {
+        List<List<String>> records = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader("D:/Talend/Jira/TDI-44723/person_100000.csv"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(COMMA_DELIMITER);
+                records.add(Arrays.asList(values));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for (List<String> record : records) {
+            inputData.add(rbf.newRecordBuilder(schema)
+                    .withString("field0", record.get(0))
+                    .withString("field1", record.get(1))
+                    .withString("field2", record.get(2))
+                    .withString("field3", record.get(3))
+                    .build());
+        }
+        String s = "ha";
+    }
+/*
+
+    private List<String> getRecordFromLine(String line) {
+        List<String> values = new ArrayList<String>();
+        try (Scanner rowScanner = new Scanner(line)) {
+            rowScanner.useDelimiter(COMMA_DELIMITER);
+            while (rowScanner.hasNext()) {
+                values.add(rowScanner.next());
+            }
+        }
+        return values;
+    }
+*/
 }
