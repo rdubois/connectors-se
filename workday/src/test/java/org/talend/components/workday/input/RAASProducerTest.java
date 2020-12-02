@@ -27,7 +27,6 @@ import org.talend.sdk.component.api.service.Service;
 import org.talend.sdk.component.junit.http.junit5.HttpApi;
 import org.talend.sdk.component.junit5.WithComponents;
 
-@Disabled
 @HttpApi(useSsl = true)
 @WithComponents("org.talend.components.workday")
 class RAASProducerTest extends WorkdayBaseTest {
