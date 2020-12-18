@@ -8,5 +8,5 @@
         <version>1.17.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>common</artifactId>
+    <artifactId>connectors-common</artifactId>
 </project>

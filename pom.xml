@@ -33,6 +33,7 @@
     </licenses>
 
     <modules>
+        <module>connectors-common</module>
         <module>jdbc</module>
         <module>salesforce</module>
         <module>mongodb</module>
@@ -40,9 +41,7 @@
         <module>azure</module>
         <module>rest</module>
         <module>dynamics-crm</module>
-        <module>azure-dls-gen2</module>
         <module>marketo</module>
-        <module>common</module>
         <module>common-stream-io</module>
         <module>connectors-test-bom</module>
         <module>bigquery</module>
@@ -76,7 +75,6 @@
 
     <properties>
         <connectors-test-bom.version>1.17.0-SNAPSHOT</connectors-test-bom.version>
-        <common.version>1.17.0-SNAPSHOT</common.version>
 
         <timestamp.year>${maven.build.timestamp}</timestamp.year>
         <maven.build.timestamp.format>yyyy</maven.build.timestamp.format>
@@ -261,11 +259,6 @@
                 <version>${connectors-test-bom.version}</version>
                 <type>pom</type>
                 <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>common</artifactId>
-                <version>${common.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.jackson</groupId>
