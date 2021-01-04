@@ -10,34 +10,20 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.talend.components.jdbc.containers;
+package org.talend.components.azure.migration;
 
-public interface JdbcTestContainer extends AutoCloseable {
+import java.util.Map;
 
-    /**
-     * @return Database as defined in the configuration file with en property <code>jdbc.drivers[].id</code>
-     */
-    String getDatabaseType();
+import org.talend.components.AzureAuthType;
+import org.talend.sdk.component.api.component.MigrationHandler;
 
-    String getUsername();
-
-    String getPassword();
-
-    String getJdbcUrl();
-
-    default String getDriverClassName() {
-        return "";
-    }
-
-    void start();
-
-    void stop();
+public class AzureStorageConnectionMigration implements MigrationHandler {
 
     @Override
-    default void close() throws Exception {
-        stop();
+    public Map<String, String> migrate(int incomingVersion, Map<String, String> incomingData) {
+        if (incomingVersion < 2) {
+            incomingData.put("accountConnection.authType", AzureAuthType.BASIC.toString());
+        }
+        return incomingData;
     }
-
-    boolean isRunning();
-
 }

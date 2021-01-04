@@ -13,7 +13,8 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.talend.components</groupId>
@@ -82,30 +83,38 @@
 
         <locales.version>[1.17,)</locales.version>
 
-        <component-runtime.version>1.1.27</component-runtime.version>
+        <component-runtime.version>1.28.0</component-runtime.version>
         <slf4j.version>1.7.28</slf4j.version>
-        <log4j-api.version>2.12.1</log4j-api.version>
-
-        <beam.version>2.25.0</beam.version>
+        <log4j-api.version>2.14.0</log4j-api.version>
         <beanutils.version>1.9.4</beanutils.version>
+
+        <beam.version>2.26.0</beam.version>
+        <spark.version>2.4.7</spark.version>
+        <shrinkwrap.version>3.1.4</shrinkwrap.version>
+        <avro.version>1.8.2</avro.version>
         <jackson.version>2.10.1</jackson.version>
         <jackson-codehaus.version>1.9.14-TALEND</jackson-codehaus.version>
+
+        <jsoup.version>1.13.1</jsoup.version>
 
         <tcomp0.version>0.23.2</tcomp0.version> <!-- until they are rewritten -->
         <daikon.version>0.31.0</daikon.version>
 
-        <junit5.version>5.5.1</junit5.version>
+        <junit5.version>5.7.0</junit5.version>
         <surefire.version>3.0.0-M3</surefire.version>
         <maven.enforcer.version>3.0.0-M3</maven.enforcer.version>
         <jacoco.version>0.8.2</jacoco.version>
 
         <commons-csv.version>1.4</commons-csv.version>
         <commons-lang3.version>3.9</commons-lang3.version>
-        <guava.version>20.0</guava.version>
+        <httpclient.version>4.5.10</httpclient.version>
         <httpclient.version>4.5.10</httpclient.version>
         <httpcore.version>4.4.12</httpcore.version>
         <compress.version>1.19</compress.version>
         <commons-codec.version>1.14</commons-codec.version>
+        <mockito.version>1.10.19</mockito.version>
+
+        <jersey.version>2.22.2</jersey.version>
 
         <talend_oss_snapshots>https://artifacts-zl.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/
         </talend_oss_snapshots>
@@ -126,6 +135,7 @@
         <jetty.version>9.4.33.v20201020</jetty.version>
         <nimbus-jose-jwt.version>8.11</nimbus-jose-jwt.version>
         <zookeeper.version>3.4.14</zookeeper.version>
+        <guava.version>30.0-jre</guava.version>
 
         <!-- code quality enforcer default values.
              run build w/ -Pcode-quality to have a full validation -->
@@ -179,12 +189,6 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
-                <groupId>org.apache.beam</groupId>
-                <artifactId>beam-sdks-java-core</artifactId>
-                <version>${beam.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
                 <groupId>commons-beanutils</groupId>
                 <artifactId>commons-beanutils</artifactId>
                 <version>${beanutils.version}</version>
@@ -231,8 +235,7 @@
             <dependency>
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro</artifactId>
-                <version>1.8.2</version>
-                <scope>provided</scope>
+                <version>${avro.version}</version>
             </dependency>
             <dependency>
                 <groupId>joda-time</groupId>
@@ -259,6 +262,11 @@
                 <version>${connectors-test-bom.version}</version>
                 <type>pom</type>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.talend.components</groupId>
+                <artifactId>common</artifactId>
+                <version>${common.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.jackson</groupId>
@@ -304,8 +312,8 @@
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
                 <version>${httpclient.version}</version>
-             </dependency>
-			 <dependency>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpcore</artifactId>
                 <version>${httpcore.version}</version>
@@ -326,9 +334,75 @@
                 <version>${commons-codec.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>${jsoup.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.core</groupId>
+                <artifactId>jersey-server</artifactId>
+                <version>${jersey.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.glassfish.jersey.media</groupId>
+                        <artifactId>jersey-media-jaxb</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.zookeeper</groupId>
                 <artifactId>zookeeper</artifactId>
                 <version>${zookeeper.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.talend.sdk.component</groupId>
+                <artifactId>component-runtime-junit</artifactId>
+                <version>${component-runtime.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.talend.sdk.component</groupId>
+                <artifactId>component-runtime-http-junit</artifactId>
+                <version>${component-runtime.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.shrinkwrap.resolver</groupId>
+                <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+                <version>${shrinkwrap.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.talend.sdk.component</groupId>
+                <artifactId>component-runtime-beam-junit</artifactId>
+                <version>${component-runtime.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.beam</groupId>
+                <artifactId>beam-sdks-java-core</artifactId>
+                <version>${beam.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.talend.sdk.component</groupId>
+                <artifactId>component-runtime-testing-spark</artifactId>
+                <version>${component-runtime.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-core_2.11</artifactId>
+                <version>${spark.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-streaming_2.11</artifactId>
+                <version>${spark.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.module</groupId>
+                <artifactId>jackson-module-scala_2.11</artifactId>
+                <version>${jackson.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -787,9 +861,9 @@
                         </goals>
                         <configuration>
                             <rules>
-                                <banDuplicatePomDependencyVersions />
-                                <dependencyConvergence />
-                                <banDistributionManagement />
+                                <banDuplicatePomDependencyVersions/>
+                                <dependencyConvergence/>
+                                <banDistributionManagement/>
                             </rules>
                         </configuration>
                     </execution>
@@ -1047,8 +1121,8 @@
                                             ${maven.multiModuleProjectDirectory}/target/documentation_resources/resources/html
                                         </stylesdir>
                                         <stylesheet>talend.css</stylesheet>
-                                        <data-uri />
-                                        <toc />
+                                        <data-uri/>
+                                        <toc/>
                                     </attributes>
                                 </configuration>
                             </execution>
