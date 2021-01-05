@@ -10,21 +10,17 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.talend.components.azure.common.csv;
+package org.talend.components.common.converters;
 
-import lombok.Getter;
+import org.talend.sdk.component.api.record.Record;
+import org.talend.sdk.component.api.record.Schema;
 
-public enum FieldDelimiter {
-    SEMICOLON(';'),
-    COMMA(','),
-    TAB('\t'),
-    SPACE(' '),
-    OTHER((char) 0);
+// TODO should be extracted to common library
+public interface RecordConverter<T> {
 
-    @Getter
-    private char delimiterValue;
+    Schema inferSchema(T record);
 
-    FieldDelimiter(char delimiter) {
-        this.delimiterValue = delimiter;
-    }
+    Record toRecord(T record);
+
+    T fromRecord(Record record);
 }

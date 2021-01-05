@@ -15,7 +15,7 @@ package org.talend.components.azure.runtime.output.excel;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.talend.components.azure.common.excel.ExcelFormat;
+import org.talend.components.common.formats.excel.ExcelFormat;
 
 public class ExcelUtils {
 

@@ -24,7 +24,7 @@ import org.apache.avro.io.DatumWriter;
 import org.talend.components.azure.common.exception.BlobRuntimeException;
 import org.talend.components.azure.common.service.AzureComponentServices;
 import org.talend.components.azure.output.BlobOutputConfiguration;
-import org.talend.components.azure.runtime.converters.AvroConverter;
+import org.talend.components.common.converters.AvroConverter;
 import org.talend.components.azure.service.AzureBlobComponentServices;
 import org.talend.sdk.component.api.record.Record;
 

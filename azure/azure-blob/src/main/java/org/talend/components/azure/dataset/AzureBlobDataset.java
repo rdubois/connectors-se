@@ -15,8 +15,8 @@ package org.talend.components.azure.dataset;
 import java.io.Serializable;
 
 import org.talend.components.azure.common.FileFormat;
-import org.talend.components.azure.common.csv.CSVFormatOptions;
-import org.talend.components.azure.common.excel.ExcelFormatOptions;
+import org.talend.components.common.formats.csv.CSVFormatOptions;
+import org.talend.components.common.formats.excel.ExcelFormatOptions;
 import org.talend.components.azure.datastore.AzureCloudConnection;
 import org.talend.components.azure.service.AzureBlobComponentServices;
 import org.talend.sdk.component.api.configuration.Option;

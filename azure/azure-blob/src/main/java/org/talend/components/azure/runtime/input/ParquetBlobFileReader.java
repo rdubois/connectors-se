@@ -23,7 +23,7 @@ import org.apache.parquet.hadoop.util.HadoopInputFile;
 import org.apache.parquet.io.InputFile;
 import org.talend.components.azure.common.Protocol;
 import org.talend.components.azure.dataset.AzureBlobDataset;
-import org.talend.components.azure.runtime.converters.ParquetConverter;
+import org.talend.components.common.converters.ParquetConverter;
 import org.talend.components.azure.service.AzureBlobComponentServices;
 import org.talend.components.azure.service.MessageService;
 import org.talend.components.azure.service.RegionUtils;

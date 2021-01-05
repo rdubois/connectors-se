@@ -10,30 +10,25 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.talend.components.azure.service;
+package org.talend.components.common.formats;
 
-import org.talend.components.azure.common.Encoding;
-import org.talend.components.azure.common.csv.CSVFormatOptions;
-import org.talend.components.azure.common.csv.FieldDelimiter;
-import org.talend.components.azure.common.csv.RecordDelimiter;
-import org.talend.components.azure.dataset.AzureBlobDataset;
+import org.talend.components.common.formats.csv.CSVFormatOptions;
+import org.talend.components.common.formats.csv.FieldDelimiter;
+import org.talend.components.common.formats.csv.RecordDelimiter;
+import org.talend.components.common.formats.excel.ExcelFormatOptions;
 
 public class FormatUtils {
 
-    public static String getUsedEncodingValue(AzureBlobDataset dataset) {
-        switch (dataset.getFileFormat()) {
-        case CSV:
-            return dataset.getCsvOptions().getEncoding() == Encoding.OTHER ? dataset.getCsvOptions().getCustomEncoding()
-                    : dataset.getCsvOptions().getEncoding().getEncodingValue();
-        // FIXME uncomment it when excel will be ready to integrate
-        /*
-         * case EXCEL:
-         * return dataset.getExcelOptions().getEncoding() == Encoding.OTHER ? dataset.getExcelOptions().getCustomEncoding()
-         * : dataset.getExcelOptions().getEncoding().getEncodingValue();
-         */
-        default:
-            throw new IllegalStateException("Avro and parquet data format doesn't support custom encodings");
-        }
+    public static String getUsedEncodingValue(CSVFormatOptions csvFormat) {
+
+        return csvFormat.getEncoding() == Encoding.OTHER ? csvFormat.getCustomEncoding()
+                : csvFormat.getEncoding().getEncodingValue();
+    }
+
+    public static String getUsedEncodingValue(ExcelFormatOptions excelFormat) {
+
+        return excelFormat.getEncoding() == Encoding.OTHER ? excelFormat.getCustomEncoding()
+                : excelFormat.getEncoding().getEncodingValue();
     }
 
     public static char getFieldDelimiterValue(CSVFormatOptions config) {

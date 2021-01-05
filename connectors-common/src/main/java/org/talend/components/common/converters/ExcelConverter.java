@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.talend.components.azure.runtime.converters;
+package org.talend.components.common.converters;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -18,13 +18,11 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.talend.components.azure.common.exception.BlobRuntimeException;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.record.Schema;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
@@ -99,7 +97,7 @@ public class ExcelConverter implements RecordConverter<Row> {
                 }
                 switch (cellType) {
                 case ERROR:
-                    throw new BlobRuntimeException("Error cell exists in excel document in the " + i + 1 + " column");
+                    throw new RuntimeException("Error cell exists in excel document in the " + i + 1 + " column");
                 case STRING:
                     entryBuilder.withType(Schema.Type.STRING);
                     break;
