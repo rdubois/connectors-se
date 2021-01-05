@@ -20,6 +20,8 @@
 
         <talend.documentation.htmlAndPdf>false</talend.documentation.htmlAndPdf>
 
+        <mockito.version>2.23.0</mockito.version>
+
         <talend.component.studioHome />
 
     </properties>
@@ -36,6 +38,25 @@
             <groupId>org.talend.components</groupId>
             <artifactId>azurecommon</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>connectors-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.junit.jupiter</groupId>
+                    <artifactId>junit-jupiter-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
