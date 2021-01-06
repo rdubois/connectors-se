@@ -25,7 +25,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.talend.components.common.formats.excel.ExcelFormat;
 import org.talend.components.azure.common.exception.BlobRuntimeException;
-import org.talend.components.azure.common.service.AzureComponentServices;
+import org.talend.components.common.service.azureblob.AzureComponentServices;
 import org.talend.components.azure.output.BlobOutputConfiguration;
 import org.talend.components.common.converters.ExcelConverter;
 import org.talend.components.azure.runtime.output.BlobFileWriter;

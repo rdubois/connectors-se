@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.talend.components.Constants;
+import org.talend.components.common.Constants;
 import org.talend.components.adlsgen2.datastore.AdlsGen2Connection;
 import org.talend.components.adlsgen2.service.AdlsActiveDirectoryService;
 

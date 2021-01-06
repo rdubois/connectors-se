@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.talend.components.adlsgen2.common.service;
+package org.talend.components.common.service.adls;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -31,7 +31,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.http.Header;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.talend.components.Constants;
+import org.talend.components.common.Constants;
 
 import lombok.extern.slf4j.Slf4j;
 

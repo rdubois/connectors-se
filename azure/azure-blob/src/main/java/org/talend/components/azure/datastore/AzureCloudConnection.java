@@ -14,8 +14,8 @@ package org.talend.components.azure.datastore;
 
 import java.io.Serializable;
 
-import org.talend.components.azure.common.connection.AzureStorageConnectionAccount;
-import org.talend.components.azure.common.connection.AzureStorageConnectionSignature;
+import org.talend.components.common.connection.azureblob.AzureStorageConnectionAccount;
+import org.talend.components.common.connection.azureblob.AzureStorageConnectionSignature;
 import org.talend.components.azure.migration.AzureStorageConnectionMigration;
 import org.talend.sdk.component.api.component.Version;
 import org.talend.sdk.component.api.configuration.Option;

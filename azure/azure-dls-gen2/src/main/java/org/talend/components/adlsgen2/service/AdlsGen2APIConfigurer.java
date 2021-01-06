@@ -12,7 +12,7 @@
  */
 package org.talend.components.adlsgen2.service;
 
-import org.talend.components.Constants;
+import org.talend.components.common.Constants;
 import org.talend.components.adlsgen2.datastore.AdlsGen2Connection;
 import org.talend.components.adlsgen2.datastore.AdlsGen2Connection.AuthMethod;
 import org.talend.sdk.component.api.service.http.Configurer;

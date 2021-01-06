@@ -10,15 +10,15 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.talend.components.adlsgen2.common.service;
+package org.talend.components.common.service.adls;
 
-import org.talend.components.adlsgen2.common.connection.AdlsGen2Connection;
+import org.talend.components.common.connection.adls.AdlsGen2Connection;
 import org.talend.sdk.component.api.service.http.*;
 
 import javax.json.JsonObject;
 
-import static org.talend.components.Constants.HeaderConstants.AUTHORIZATION;
-import static org.talend.components.Constants.HeaderConstants.DATE;
+import static org.talend.components.common.Constants.HeaderConstants.AUTHORIZATION;
+import static org.talend.components.common.Constants.HeaderConstants.DATE;
 
 public interface AdlsGen2APIClient extends HttpClient {
 

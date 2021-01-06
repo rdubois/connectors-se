@@ -24,7 +24,7 @@ import org.talend.components.common.formats.csv.CSVFormatOptions;
 import org.talend.components.common.formats.excel.ExcelFormat;
 import org.talend.components.common.formats.excel.ExcelFormatOptions;
 import org.talend.components.azure.common.exception.BlobRuntimeException;
-import org.talend.components.azure.common.service.AzureComponentServices;
+import org.talend.components.common.service.azureblob.AzureComponentServices;
 import org.talend.components.azure.dataset.AzureBlobDataset;
 import org.talend.components.azure.service.AzureBlobComponentServices;
 import org.talend.components.azure.service.MessageService;

@@ -33,7 +33,7 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.talend.components.azure.common.FileFormat;
-import org.talend.components.azure.common.connection.AzureStorageConnectionAccount;
+import org.talend.components.common.connection.azureblob.AzureStorageConnectionAccount;
 import org.talend.components.common.formats.csv.CSVFormatOptions;
 import org.talend.components.azure.dataset.AzureBlobDataset;
 import org.talend.components.azure.datastore.AzureCloudConnection;

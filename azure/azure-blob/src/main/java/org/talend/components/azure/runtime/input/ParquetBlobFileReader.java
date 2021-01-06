@@ -21,7 +21,7 @@ import org.apache.parquet.avro.AvroParquetReader;
 import org.apache.parquet.hadoop.ParquetReader;
 import org.apache.parquet.hadoop.util.HadoopInputFile;
 import org.apache.parquet.io.InputFile;
-import org.talend.components.azure.common.Protocol;
+import org.talend.components.common.connection.azureblob.Protocol;
 import org.talend.components.azure.dataset.AzureBlobDataset;
 import org.talend.components.common.converters.ParquetConverter;
 import org.talend.components.azure.service.AzureBlobComponentServices;

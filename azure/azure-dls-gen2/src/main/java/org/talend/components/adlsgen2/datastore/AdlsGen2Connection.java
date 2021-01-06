@@ -14,7 +14,7 @@ package org.talend.components.adlsgen2.datastore;
 
 import java.io.Serializable;
 
-import org.talend.components.Constants;
+import org.talend.components.common.Constants;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.configuration.action.Checkable;
 import org.talend.sdk.component.api.configuration.condition.ActiveIf;

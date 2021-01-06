@@ -10,13 +10,11 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.talend.components.azure.common.connection;
+package org.talend.components.common.connection.azureblob;
 
 import java.io.Serializable;
 
-import org.talend.components.AzureAuthType;
-import org.talend.components.AzureConnectionActiveDir;
-import org.talend.components.azure.common.Protocol;
+import org.talend.components.common.connection.adls.AzureAuthType;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.configuration.condition.ActiveIf;
 import org.talend.sdk.component.api.configuration.ui.layout.GridLayout;

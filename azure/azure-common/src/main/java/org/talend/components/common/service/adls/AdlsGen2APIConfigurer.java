@@ -10,13 +10,13 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.talend.components.adlsgen2.common.service;
+package org.talend.components.common.service.adls;
 
 import lombok.extern.slf4j.Slf4j;
-import org.talend.components.adlsgen2.common.connection.AdlsGen2Connection;
+import org.talend.components.common.connection.adls.AdlsGen2Connection;
 import org.talend.sdk.component.api.service.http.Configurer;
 
-import static org.talend.components.Constants.HeaderConstants.*;
+import static org.talend.components.common.Constants.HeaderConstants.*;
 
 @Slf4j
 public class AdlsGen2APIConfigurer implements Configurer {

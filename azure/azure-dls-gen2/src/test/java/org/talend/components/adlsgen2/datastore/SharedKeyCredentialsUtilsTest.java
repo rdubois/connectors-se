@@ -22,7 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnJre;
 import org.junit.jupiter.api.condition.JRE;
-import org.talend.components.Constants;
+import org.talend.components.common.Constants;
 import org.talend.components.adlsgen2.AdlsGen2TestBase;
 import org.talend.sdk.component.junit5.WithComponents;
 

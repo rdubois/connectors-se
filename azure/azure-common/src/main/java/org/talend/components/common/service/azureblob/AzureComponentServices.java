@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.talend.components.azure.common.service;
+package org.talend.components.common.service.azureblob;
 
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -18,10 +18,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.talend.components.AzureConnectionActiveDir;
-import org.talend.components.azure.common.Protocol;
-import org.talend.components.azure.common.connection.AzureStorageConnectionAccount;
-import org.talend.components.azure.common.connection.AzureStorageConnectionSignature;
+import org.talend.components.common.connection.azureblob.AzureConnectionActiveDir;
+import org.talend.components.common.connection.azureblob.Protocol;
+import org.talend.components.common.connection.azureblob.AzureStorageConnectionAccount;
+import org.talend.components.common.connection.azureblob.AzureStorageConnectionSignature;
 import org.talend.components.azure.runtime.token.AzureActiveDirectoryTokenGetter;
 import org.talend.sdk.component.api.service.Service;
 import org.talend.sdk.component.api.service.healthcheck.HealthCheckStatus;
