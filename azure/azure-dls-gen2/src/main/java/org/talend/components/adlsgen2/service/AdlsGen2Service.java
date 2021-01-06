@@ -32,15 +32,13 @@ import javax.json.JsonObject;
 import javax.json.JsonValue;
 
 import org.apache.commons.lang3.StringUtils;
+import org.talend.components.Constants;
 import org.talend.components.adlsgen2.common.format.avro.AvroIterator;
 import org.talend.components.adlsgen2.common.format.csv.CsvIterator;
 import org.talend.components.adlsgen2.common.format.json.JsonIterator;
 import org.talend.components.adlsgen2.common.format.parquet.ParquetIterator;
 import org.talend.components.adlsgen2.dataset.AdlsGen2DataSet;
 import org.talend.components.adlsgen2.datastore.AdlsGen2Connection;
-import org.talend.components.adlsgen2.datastore.Constants;
-import org.talend.components.adlsgen2.datastore.Constants.HeaderConstants;
-import org.talend.components.adlsgen2.datastore.Constants.MethodConstants;
 import org.talend.components.adlsgen2.datastore.SharedKeyUtils;
 import org.talend.components.adlsgen2.runtime.AdlsDatasetRuntimeInfo;
 import org.talend.components.adlsgen2.runtime.AdlsDatastoreRuntimeInfo;
@@ -90,14 +88,14 @@ public class AdlsGen2Service {
     private Map<String, String> prepareRequestHeaders(final Map<String, String> secretsMap, final AdlsGen2Connection connection,
             String url, String method, String payloadLength) {
         log.debug("[prepareRequest] {} [{}].", url, method);
-        secretsMap.put(HeaderConstants.USER_AGENT, HeaderConstants.USER_AGENT_AZURE_DLS_GEN2);
+        secretsMap.put(Constants.HeaderConstants.USER_AGENT, Constants.HeaderConstants.USER_AGENT_AZURE_DLS_GEN2);
         secretsMap.put(Constants.HeaderConstants.DATE, Constants.RFC1123GMTDateFormatter.format(OffsetDateTime.now()));
-        secretsMap.put(HeaderConstants.CONTENT_TYPE, HeaderConstants.DFS_CONTENT_TYPE);
-        secretsMap.put(HeaderConstants.VERSION, HeaderConstants.TARGET_STORAGE_VERSION);
+        secretsMap.put(Constants.HeaderConstants.CONTENT_TYPE, Constants.HeaderConstants.DFS_CONTENT_TYPE);
+        secretsMap.put(Constants.HeaderConstants.VERSION, Constants.HeaderConstants.TARGET_STORAGE_VERSION);
         if (StringUtils.isNotEmpty(payloadLength)) {
-            secretsMap.put(HeaderConstants.CONTENT_LENGTH, payloadLength);
+            secretsMap.put(Constants.HeaderConstants.CONTENT_LENGTH, payloadLength);
         } else {
-            secretsMap.remove(HeaderConstants.CONTENT_LENGTH);
+            secretsMap.remove(Constants.HeaderConstants.CONTENT_LENGTH);
         }
 
         if (connection.getAuthMethod().equals(AdlsGen2Connection.AuthMethod.SharedKey)) {
@@ -105,7 +103,7 @@ public class AdlsGen2Service {
                 URL dest = new URL(url);
                 String auth = new SharedKeyUtils(connection.getAccountName(), connection.getSharedKey())
                         .buildAuthenticationSignature(dest, method, secretsMap);
-                secretsMap.put(HeaderConstants.AUTHORIZATION, auth);
+                secretsMap.put(Constants.HeaderConstants.AUTHORIZATION, auth);
             } catch (Exception e) {
                 log.error("[prepareRequest] {}", e.getMessage());
                 throw new AdlsGen2RuntimeException(e.getMessage());
@@ -123,7 +121,7 @@ public class AdlsGen2Service {
     private static AdlsGen2RuntimeException handleError(final int status, final Map<String, List<String>> headers,
             String errorMessage) {
         StringBuilder sb = new StringBuilder();
-        List<String> errors = headers.get(HeaderConstants.HEADER_X_MS_ERROR_CODE);
+        List<String> errors = headers.get(Constants.HeaderConstants.HEADER_X_MS_ERROR_CODE);
         if (errors != null && !errors.isEmpty()) {
             for (String error : errors) {
                 sb.append(error);
@@ -178,7 +176,7 @@ public class AdlsGen2Service {
         String url = String.format("%s/?resource=account&timeout=%d", connectionRuntimeInfo.getConnection().apiUrl(),
                 connectionRuntimeInfo.getConnection().getTimeout());
         Map<String, String> headers = prepareRequestHeaders(connectionRuntimeInfo.getAdTokenMap(),
-                connectionRuntimeInfo.getConnection(), url, MethodConstants.GET, "");
+                connectionRuntimeInfo.getConnection(), url, Constants.MethodConstants.GET, "");
         Response<JsonObject> result = handleResponse(client.filesystemList(headers, connectionRuntimeInfo.getSASMap(),
                 Constants.ATTR_ACCOUNT, connectionRuntimeInfo.getConnection().getTimeout()));
         List<String> fs = new ArrayList<>();
@@ -195,7 +193,7 @@ public class AdlsGen2Service {
         String url = getUrlStringWithoutPosition(datasetRuntimeInfo, rcfmt);
         log.debug("[pathList] {}", url);
         Map<String, String> headers = prepareRequestHeaders(datasetRuntimeInfo.getAdTokenMap(),
-                datasetRuntimeInfo.getDataSet().getConnection(), url, MethodConstants.GET, "");
+                datasetRuntimeInfo.getDataSet().getConnection(), url, Constants.MethodConstants.GET, "");
         Response<JsonObject> result = handleResponse(client.pathList( //
                 headers, //
                 datasetRuntimeInfo.getDataSet().getFilesystem(), //
@@ -237,7 +235,7 @@ public class AdlsGen2Service {
         );
         log.debug("[pathGetProperties] {}", url);
         Map<String, String> headers = prepareRequestHeaders(datasetRuntimeInfo.getAdTokenMap(),
-                datasetRuntimeInfo.getConnection(), url, MethodConstants.HEAD, "");
+                datasetRuntimeInfo.getConnection(), url, Constants.MethodConstants.HEAD, "");
         Map<String, String> properties = new HashMap<>();
         Response<JsonObject> result = handleResponse(client.pathGetProperties( //
                 headers, //
@@ -262,7 +260,7 @@ public class AdlsGen2Service {
         String url = getUrlStringWithoutPosition(datasetRuntimeInfo, rcfmt);
         log.debug("[getBlobs] {}", url);
         Map<String, String> headers = prepareRequestHeaders(datasetRuntimeInfo.getAdTokenMap(),
-                datasetRuntimeInfo.getConnection(), url, MethodConstants.GET, "");
+                datasetRuntimeInfo.getConnection(), url, Constants.MethodConstants.GET, "");
         Response<JsonObject> result = handleResponse(client.pathList( //
                 headers, //
                 datasetRuntimeInfo.getDataSet().getFilesystem(), //
@@ -316,7 +314,7 @@ public class AdlsGen2Service {
         );
         log.debug("[getBlobInformations] {}", url);
         Map<String, String> headers = prepareRequestHeaders(datasetRuntimeInfo.getAdTokenMap(),
-                datasetRuntimeInfo.getConnection(), url, MethodConstants.GET, "");
+                datasetRuntimeInfo.getConnection(), url, Constants.MethodConstants.GET, "");
         BlobInformations infos = new BlobInformations();
         Response<JsonObject> result = client.pathList( //
                 headers, //
@@ -365,7 +363,7 @@ public class AdlsGen2Service {
         );
         log.debug("[blobExists] {}", url);
         Map<String, String> headers = prepareRequestHeaders(datasetRuntimeInfo.getAdTokenMap(),
-                datasetRuntimeInfo.getConnection(), url, MethodConstants.GET, "");
+                datasetRuntimeInfo.getConnection(), url, Constants.MethodConstants.GET, "");
         BlobInformations infos = new BlobInformations();
         Response<JsonObject> result = client.pathList( //
                 headers, //
@@ -402,7 +400,7 @@ public class AdlsGen2Service {
         String url = getUrlStringWithoutPosition(datasetRuntimeInfo, rcfmt);
         log.debug("[pathRead] {}", url);
         Map<String, String> headers = prepareRequestHeaders(datasetRuntimeInfo.getAdTokenMap(),
-                datasetRuntimeInfo.getConnection(), url, MethodConstants.GET, "");
+                datasetRuntimeInfo.getConnection(), url, Constants.MethodConstants.GET, "");
         Response<InputStream> result = handleResponse(client.pathRead( //
                 headers, //
                 datasetRuntimeInfo.getDataSet().getFilesystem(), //
@@ -425,7 +423,7 @@ public class AdlsGen2Service {
         );
         log.debug("[getBlobInputstream] {}", url);
         Map<String, String> headers = prepareRequestHeaders(datasetRuntimeInfo.getAdTokenMap(),
-                datasetRuntimeInfo.getConnection(), url, MethodConstants.GET, "");
+                datasetRuntimeInfo.getConnection(), url, Constants.MethodConstants.GET, "");
         Response<InputStream> result = handleResponse(client.pathRead( //
                 headers, //
                 datasetRuntimeInfo.getDataSet().getFilesystem(), //
@@ -443,7 +441,7 @@ public class AdlsGen2Service {
         String url = getUrlStringWithoutPosition(datasetRuntimeInfo, rcfmt);
         log.debug("[pathCreate] {}", url);
         Map<String, String> headers = prepareRequestHeaders(datasetRuntimeInfo.getAdTokenMap(),
-                datasetRuntimeInfo.getConnection(), url, MethodConstants.PUT, "");
+                datasetRuntimeInfo.getConnection(), url, Constants.MethodConstants.PUT, "");
         return handleResponse(client.pathCreate( //
                 headers, //
                 datasetRuntimeInfo.getDataSet().getFilesystem(), //
@@ -461,7 +459,7 @@ public class AdlsGen2Service {
         String url = getUrlStringWithPosition(datasetRuntimeInfo, position, rcfmt);
         log.debug("[pathUpdate] {}", url);
         Map<String, String> headers = prepareRequestHeaders(datasetRuntimeInfo.getAdTokenMap(),
-                datasetRuntimeInfo.getConnection(), url, MethodConstants.PATCH, String.valueOf(content.length));
+                datasetRuntimeInfo.getConnection(), url, Constants.MethodConstants.PATCH, String.valueOf(content.length));
         return handleResponse(client.pathUpdate( //
                 headers, //
                 datasetRuntimeInfo.getDataSet().getFilesystem(), //
@@ -490,7 +488,7 @@ public class AdlsGen2Service {
         String url = getUrlStringWithPosition(datasetRuntimeInfo, position, rcfmt);
         log.debug("[flushBlob#pathUpdate] {}", url);
         Map<String, String> headers = prepareRequestHeaders(datasetRuntimeInfo.getAdTokenMap(),
-                datasetRuntimeInfo.getConnection(), url, MethodConstants.PATCH, "");
+                datasetRuntimeInfo.getConnection(), url, Constants.MethodConstants.PATCH, "");
         return handleResponse(client.pathUpdate( //
                 headers, //
                 datasetRuntimeInfo.getDataSet().getFilesystem(), //

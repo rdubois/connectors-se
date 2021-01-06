@@ -18,10 +18,10 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.talend.components.Constants;
 import org.talend.components.adlsgen2.AdlsGen2TestBase;
 import org.talend.components.adlsgen2.common.format.FileFormat;
 import org.talend.components.adlsgen2.datastore.AdlsGen2Connection.AuthMethod;
-import org.talend.components.adlsgen2.datastore.Constants.HeaderConstants;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.service.Service;
 import org.talend.sdk.component.junit5.WithComponents;
@@ -154,6 +154,6 @@ class AdlsGen2ServiceTestIT extends AdlsGen2TestBase {
 
     @Test
     void testUserAgentValue() {
-        assertEquals("APN/1.0 Talend/2019 tck/1.1.9", HeaderConstants.USER_AGENT_AZURE_DLS_GEN2);
+        assertEquals("APN/1.0 Talend/2019 tck/1.1.9", Constants.HeaderConstants.USER_AGENT_AZURE_DLS_GEN2);
     }
 }

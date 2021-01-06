@@ -22,8 +22,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnJre;
 import org.junit.jupiter.api.condition.JRE;
+import org.talend.components.Constants;
 import org.talend.components.adlsgen2.AdlsGen2TestBase;
-import org.talend.components.adlsgen2.datastore.Constants.MethodConstants;
 import org.talend.sdk.component.junit5.WithComponents;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -69,13 +69,13 @@ class SharedKeyCredentialsUtilsTest extends AdlsGen2TestBase {
     @EnabledOnJre({ JRE.JAVA_11 })
     void checkSignature() throws Exception {
         expectedSignature = "SharedKey username:8GgdJcEk+FLk2oNJeLuAAIj4O2QMrG4Z1SE4xoV3oTI=";
-        signature = utils.buildAuthenticationSignature(url, MethodConstants.GET, headers);
+        signature = utils.buildAuthenticationSignature(url, Constants.MethodConstants.GET, headers);
         assertNotNull(signature);
         assertTrue(signature.startsWith("SharedKey username:"));
         assertEquals(expectedSignature, signature);
         OffsetDateTime oneSecLater = OffsetDateTime.of(2019, 8, 7, 11, 11, 1, 0, ZoneOffset.UTC);
         headers.put(Constants.HeaderConstants.DATE, Constants.RFC1123GMTDateFormatter.format(oneSecLater));
-        signature = utils.buildAuthenticationSignature(url, MethodConstants.GET, headers);
+        signature = utils.buildAuthenticationSignature(url, Constants.MethodConstants.GET, headers);
         assertNotEquals(expectedSignature, signature);
     }
 
@@ -84,12 +84,12 @@ class SharedKeyCredentialsUtilsTest extends AdlsGen2TestBase {
     void checkSignatureWithSpacesInBlobName() throws Exception {
         expectedSignature = "SharedKey username:jIgUXkXGQGVmfyHYMWDC7AGEkQyVmcldGmTiQYL4oFc=";
         url = new URL("https://undxgen2.dfs.core.windows.net/adls-gen2/directory/my New Blob.spacy&timeout=60");
-        signature = utils.buildAuthenticationSignature(url, MethodConstants.GET, headers);
+        signature = utils.buildAuthenticationSignature(url, Constants.MethodConstants.GET, headers);
         assertNotNull(signature);
         assertTrue(signature.startsWith("SharedKey username:"));
         assertEquals(expectedSignature, signature);
         url = new URL("https://undxgen2.dfs.core.windows.net/adls-gen2/directory/my%20New%20Blob.spacy&timeout=60");
-        signature = utils.buildAuthenticationSignature(url, MethodConstants.GET, headers);
+        signature = utils.buildAuthenticationSignature(url, Constants.MethodConstants.GET, headers);
         assertNotNull(signature);
         assertTrue(signature.startsWith("SharedKey username:"));
         assertEquals(expectedSignature, signature);

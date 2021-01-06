@@ -12,9 +12,9 @@
  */
 package org.talend.components.adlsgen2.service;
 
+import org.talend.components.Constants;
 import org.talend.components.adlsgen2.datastore.AdlsGen2Connection;
 import org.talend.components.adlsgen2.datastore.AdlsGen2Connection.AuthMethod;
-import org.talend.components.adlsgen2.datastore.Constants.HeaderConstants;
 import org.talend.sdk.component.api.service.http.Configurer;
 
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ public class AdlsGen2APIConfigurer implements Configurer {
         final AdlsGen2Connection conn = configuration.get("connection", AdlsGen2Connection.class);
         final String auth = configuration.get("auth", String.class);
         if (!AuthMethod.SAS.equals(conn.getAuthMethod())) {
-            connection.withHeader(HeaderConstants.AUTHORIZATION, auth);
+            connection.withHeader(Constants.HeaderConstants.AUTHORIZATION, auth);
         }
         if (connection.getMethod().equals("POST")) {
             connection.withHeader(" X-HTTP-Method", "PUT"); //

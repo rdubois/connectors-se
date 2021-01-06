@@ -12,20 +12,28 @@
  */
 package org.talend.components.adlsgen2.common.service;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.http.Header;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.talend.components.adlsgen2.common.connection.Constants;
-import org.talend.components.adlsgen2.common.connection.Constants.HeaderConstants;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
+import org.apache.http.Header;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.talend.components.Constants;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * SharedKeyCredentials are a means of signing and authenticating storage requests. The key can be obtained from the
@@ -75,14 +83,17 @@ public final class SharedKeyUtils {
         String contentLength = getStandardHeaderValue("contentLength");
         contentLength = contentLength.equals("0") ? Constants.EMPTY_STRING : contentLength;
 
-        return String.join("\n", requestBase.getMethod(), getStandardHeaderValue(HeaderConstants.CONTENT_ENCODING),
-                getStandardHeaderValue(HeaderConstants.CONTENT_LANGUAGE), contentLength,
-                getStandardHeaderValue(HeaderConstants.CONTENT_MD5), getStandardHeaderValue(HeaderConstants.CONTENT_TYPE),
+        return String.join("\n", requestBase.getMethod(), getStandardHeaderValue(Constants.HeaderConstants.CONTENT_ENCODING),
+                getStandardHeaderValue(Constants.HeaderConstants.CONTENT_LANGUAGE), contentLength,
+                getStandardHeaderValue(Constants.HeaderConstants.CONTENT_MD5),
+                getStandardHeaderValue(Constants.HeaderConstants.CONTENT_TYPE),
                 // x-ms-date header exists, so don't sign date header
-                Constants.EMPTY_STRING, getStandardHeaderValue(HeaderConstants.IF_MODIFIED_SINCE),
-                getStandardHeaderValue(HeaderConstants.IF_MATCH), getStandardHeaderValue(HeaderConstants.IF_NONE_MATCH),
-                getStandardHeaderValue(HeaderConstants.IF_UNMODIFIED_SINCE), getStandardHeaderValue(HeaderConstants.RANGE),
-                getAdditionalXmsHeaders(), getCanonicalizedResource(requestBase.getURI()));
+                Constants.EMPTY_STRING, getStandardHeaderValue(Constants.HeaderConstants.IF_MODIFIED_SINCE),
+                getStandardHeaderValue(Constants.HeaderConstants.IF_MATCH),
+                getStandardHeaderValue(Constants.HeaderConstants.IF_NONE_MATCH),
+                getStandardHeaderValue(Constants.HeaderConstants.IF_UNMODIFIED_SINCE),
+                getStandardHeaderValue(Constants.HeaderConstants.RANGE), getAdditionalXmsHeaders(),
+                getCanonicalizedResource(requestBase.getURI()));
     }
 
     private void appendCanonicalizedElement(final StringBuilder builder, final String element) {
@@ -211,9 +222,9 @@ public final class SharedKeyUtils {
 
     public String buildAuthenticationSignature(HttpRequestBase request) {
         this.requestBase = request;
-        Header dateHeader = requestBase.getFirstHeader(HeaderConstants.DATE);
+        Header dateHeader = requestBase.getFirstHeader(Constants.HeaderConstants.DATE);
         if (dateHeader == null) {
-            throw new IllegalArgumentException("Header: " + HeaderConstants.DATE + "is mandatory.");
+            throw new IllegalArgumentException("Header: " + Constants.HeaderConstants.DATE + "is mandatory.");
         }
 
         final String stringToSign = buildStringToSign();

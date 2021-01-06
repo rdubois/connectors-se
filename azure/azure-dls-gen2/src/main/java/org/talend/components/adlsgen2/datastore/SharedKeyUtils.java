@@ -27,6 +27,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
+import org.talend.components.Constants;
 import org.talend.components.adlsgen2.runtime.AdlsGen2RuntimeException;
 
 import lombok.extern.slf4j.Slf4j;

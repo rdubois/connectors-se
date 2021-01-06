@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.talend.components.adlsgen2.common.connection.AdlsGen2Connection;
 import org.talend.sdk.component.api.service.http.Configurer;
 
-import static org.talend.components.adlsgen2.common.connection.Constants.HeaderConstants.*;
+import static org.talend.components.Constants.HeaderConstants.*;
 
 @Slf4j
 public class AdlsGen2APIConfigurer implements Configurer {

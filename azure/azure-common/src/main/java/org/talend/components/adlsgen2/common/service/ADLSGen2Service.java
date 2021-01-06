@@ -20,8 +20,8 @@ import org.apache.http.entity.FileEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.talend.components.Constants;
 import org.talend.components.adlsgen2.common.connection.AdlsGen2Connection;
-import org.talend.components.adlsgen2.common.connection.Constants;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.service.Service;
 import org.talend.sdk.component.api.service.completion.SuggestionValues;
@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.lang.System.nanoTime;
-import static org.talend.components.adlsgen2.common.connection.Constants.HeaderConstants.*;
+import static org.talend.components.Constants.HeaderConstants.*;
 
 @Slf4j
 @Service

@@ -17,8 +17,8 @@ import org.talend.sdk.component.api.service.http.*;
 
 import javax.json.JsonObject;
 
-import static org.talend.components.adlsgen2.common.connection.Constants.HeaderConstants.AUTHORIZATION;
-import static org.talend.components.adlsgen2.common.connection.Constants.HeaderConstants.DATE;
+import static org.talend.components.Constants.HeaderConstants.AUTHORIZATION;
+import static org.talend.components.Constants.HeaderConstants.DATE;
 
 public interface AdlsGen2APIClient extends HttpClient {
 

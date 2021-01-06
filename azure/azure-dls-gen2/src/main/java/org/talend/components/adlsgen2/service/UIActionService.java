@@ -13,13 +13,10 @@
 package org.talend.components.adlsgen2.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.talend.components.adlsgen2.datastore.AdlsGen2Connection;
 import org.talend.components.adlsgen2.datastore.AdlsGen2Connection.AuthMethod;
-import org.talend.components.adlsgen2.datastore.Constants;
 import org.talend.components.adlsgen2.runtime.AdlsDatastoreRuntimeInfo;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.service.Service;

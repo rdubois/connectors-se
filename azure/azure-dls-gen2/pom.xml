@@ -29,7 +29,7 @@
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
-            <artifactId>connectors-common</artifactId>
+            <artifactId>azure-common</artifactId>
             <version>${project.version}</version>
         </dependency>
 

@@ -26,6 +26,11 @@
   <name>Components :: AzureCommon</name>
 
   <dependencies>
+    <dependency>
+      <groupId>org.talend.components</groupId>
+      <artifactId>connectors-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- traductions -->
     <dependency>
       <groupId>org.talend.components</groupId>

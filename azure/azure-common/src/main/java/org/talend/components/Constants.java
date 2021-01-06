@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.talend.components.adlsgen2.common.connection;
+package org.talend.components;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -18,7 +18,7 @@ import java.util.Locale;
 
 public class Constants {
 
-    public static final String DFS_URL = "https://%s.dfs.core.windows.net";
+    public static final String DFS_URL_PATTERN = "https://%s.%s";
 
     public static final String DFS_DEFAULT_ENDPOINT_SUFFIX = "dfs.core.windows.net";
 
@@ -137,11 +137,24 @@ public class Constants {
 
     public static final String ATTR_FILE = "file";
 
+    public static final String ATTR_IS_DIRECTORY = "isDirectory";
+
     /**
      * Private Default Ctor
      */
     private Constants() {
         // Private to prevent construction.
+    }
+
+    public static final class MethodConstants {
+
+        public static final String GET = "GET";
+
+        public static final String HEAD = "HEAD";
+
+        public static final String PUT = "PUT";
+
+        public static final String PATCH = "PATCH";
     }
 
     /**
@@ -273,6 +286,17 @@ public class Constants {
         public static final String ACCEPT = "Accept";
 
         public static final String ACCEPT_DEFAULT = "application/json, */*";
+
+        public static final String UA_AZURE_DLS_GEN2_PREFIX = "APN/1.0 Talend/";
+
+        public static final String UA_AZURE_DLS_GEN2_DATE = "2019";
+
+        public static final String UA_AZURE_DLS_GEN2_TACOKIT = " tck/";
+
+        public static final String UA_AZURE_DLS_GEN2_TACOKIT_RELEASE = "1.1.9";
+
+        public static final String USER_AGENT_AZURE_DLS_GEN2 = UA_AZURE_DLS_GEN2_PREFIX + UA_AZURE_DLS_GEN2_DATE
+                + UA_AZURE_DLS_GEN2_TACOKIT + UA_AZURE_DLS_GEN2_TACOKIT_RELEASE;
 
         private HeaderConstants() {
             // Private to prevent construction.
