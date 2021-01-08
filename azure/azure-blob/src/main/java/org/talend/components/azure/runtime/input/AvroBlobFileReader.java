@@ -22,9 +22,11 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumReader;
 import org.talend.components.azure.common.exception.BlobRuntimeException;
 import org.talend.components.azure.dataset.AzureBlobDataset;
+import org.talend.components.common.Constants;
 import org.talend.components.common.converters.AvroConverter;
 import org.talend.components.azure.service.AzureBlobComponentServices;
 import org.talend.components.azure.service.MessageService;
+import org.talend.components.common.formats.AvroConfiguration;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
 
@@ -34,6 +36,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class AvroBlobFileReader extends BlobFileReader {
+
+    private AvroConfiguration config;
 
     public AvroBlobFileReader(AzureBlobDataset config, RecordBuilderFactory recordBuilderFactory,
             AzureBlobComponentServices connectionServices, MessageService messageService)
@@ -62,7 +66,7 @@ public class AvroBlobFileReader extends BlobFileReader {
         @Override
         protected Record convertToRecord(GenericRecord next) {
             if (converter == null) {
-                converter = AvroConverter.of(getRecordBuilderFactory());
+                converter = AvroConverter.of(getRecordBuilderFactory(), config, Constants.AZURE_BLOB_NAMESPACE);
             }
 
             return converter.toRecord(next);

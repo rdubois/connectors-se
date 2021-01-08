@@ -22,6 +22,8 @@ import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumReader;
 import org.talend.components.adlsgen2.common.format.FileFormatRuntimeException;
+import org.talend.components.common.converters.AvroConverter;
+import org.talend.components.common.formats.AvroConfiguration;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.service.configuration.Configuration;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;

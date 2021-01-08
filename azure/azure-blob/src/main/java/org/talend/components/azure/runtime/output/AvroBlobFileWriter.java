@@ -22,6 +22,7 @@ import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumWriter;
 import org.talend.components.azure.common.exception.BlobRuntimeException;
+import org.talend.components.common.Constants;
 import org.talend.components.common.service.azureblob.AzureComponentServices;
 import org.talend.components.azure.output.BlobOutputConfiguration;
 import org.talend.components.common.converters.AvroConverter;
@@ -40,7 +41,7 @@ public class AvroBlobFileWriter extends BlobFileWriter {
     public AvroBlobFileWriter(BlobOutputConfiguration config, AzureBlobComponentServices connectionServices) throws Exception {
         super(config, connectionServices);
         this.config = config;
-        converter = AvroConverter.of(null);
+        converter = AvroConverter.of(null, null, Constants.AZURE_BLOB_NAMESPACE);
     }
 
     @Override

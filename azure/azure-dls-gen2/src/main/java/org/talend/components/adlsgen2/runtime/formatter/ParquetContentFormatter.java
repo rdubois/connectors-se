@@ -23,9 +23,10 @@ import org.apache.hadoop.fs.Path;
 import org.apache.parquet.avro.AvroParquetWriter;
 import org.apache.parquet.hadoop.ParquetFileWriter;
 import org.apache.parquet.hadoop.ParquetWriter;
-import org.talend.components.adlsgen2.common.format.parquet.ParquetConverter;
 import org.talend.components.adlsgen2.output.OutputConfiguration;
 import org.talend.components.adlsgen2.runtime.AdlsGen2RuntimeException;
+import org.talend.components.common.Constants;
+import org.talend.components.common.converters.ParquetConverter;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
@@ -45,7 +46,8 @@ public class ParquetContentFormatter extends AbstractContentFormatter {
             RecordBuilderFactory recordBuilderFactory) {
         this.recordBuilderFactory = recordBuilderFactory;
         this.configuration = configuration;
-        converter = ParquetConverter.of(recordBuilderFactory, configuration.getDataSet().getParquetConfiguration());
+        converter = ParquetConverter.of(recordBuilderFactory, configuration.getDataSet().getParquetConfiguration(),
+                Constants.ADLS_NAMESPACE);
     }
 
     @Override

@@ -10,21 +10,22 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.talend.components.azure.runtime.converters;
+package org.talend.components.common.converters;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
+import org.apache.avro.LogicalTypes;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.talend.components.common.converters.AvroConverter;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.record.Schema;
 import org.talend.sdk.component.api.record.Schema.Entry;
@@ -42,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@WithComponents("org.talend.components.azure")
+@WithComponents("org.talend.components.common")
 class AvroConverterTest {
 
     private AvroConverter converter;
@@ -63,7 +64,7 @@ class AvroConverterTest {
     @BeforeEach
     protected void setUp() throws Exception {
         recordBuilderFactory = componentsHandler.findService(RecordBuilderFactory.class);
-        converter = AvroConverter.of(recordBuilderFactory);
+        converter = AvroConverter.of(recordBuilderFactory, null);
         avro = new GenericData.Record( //
                 SchemaBuilder.builder().record("sample").fields() //
                         .name("string").type().stringType().noDefault() //
@@ -108,7 +109,7 @@ class AvroConverterTest {
 
     @Test
     void of() {
-        assertNotNull(AvroConverter.of(recordBuilderFactory));
+        assertNotNull(AvroConverter.of(recordBuilderFactory, null));
     }
 
     @Test
@@ -240,5 +241,93 @@ class AvroConverterTest {
 
         assertNotNull(testRecord.getString("nullStringColumn"));
         assertFalse(testRecord.getOptionalInt("nullIntColumn").isPresent());
+    }
+
+    @Test
+    void testArrays() {
+        List<String> strings = Arrays.asList("string1", "string2");
+        List<Integer> integers = Arrays.asList(12345, 56789);
+        List<Long> longs = Arrays.asList(12345L, 67890L);
+        List<Float> floats = Arrays.asList(54321.9f, 0x1.2p3f);
+        List<Double> doubles = Arrays.asList(1.2345699E05, 5.678999E04);
+        List<Boolean> booleans = Arrays.asList(true, false);
+        List<byte[]> bytes = Arrays.asList("string1".getBytes(), "string2".getBytes());
+        List<Record> records = Arrays.asList(versatileRecord, versatileRecord);
+        //
+        final Schema.Entry.Builder entryBuilder = recordBuilderFactory.newEntryBuilder();
+        Record input = recordBuilderFactory.newRecordBuilder() //
+                .withArray(entryBuilder.withName("strings").withType(Schema.Type.ARRAY)
+                        .withElementSchema(recordBuilderFactory.newSchemaBuilder(Type.STRING).build()).build(), strings)
+                .withArray(entryBuilder.withName("integers").withType(Schema.Type.ARRAY)
+                        .withElementSchema(recordBuilderFactory.newSchemaBuilder(Type.INT).build()).build(), integers)
+                .withArray(entryBuilder.withName("longs").withType(Schema.Type.ARRAY)
+                        .withElementSchema(recordBuilderFactory.newSchemaBuilder(Type.LONG).build()).build(), longs)
+                .withArray(entryBuilder.withName("floats").withType(Schema.Type.ARRAY)
+                        .withElementSchema(recordBuilderFactory.newSchemaBuilder(Type.FLOAT).build()).build(), floats)
+                .withArray(entryBuilder.withName("doubles").withType(Schema.Type.ARRAY)
+                        .withElementSchema(recordBuilderFactory.newSchemaBuilder(Type.DOUBLE).build()).build(), doubles)
+                .withArray(entryBuilder.withName("booleans").withType(Schema.Type.ARRAY)
+                        .withElementSchema(recordBuilderFactory.newSchemaBuilder(Type.BOOLEAN).build()).build(), booleans)
+                .withArray(entryBuilder.withName("bytes").withType(Schema.Type.ARRAY)
+                        .withElementSchema(recordBuilderFactory.newSchemaBuilder(Type.BYTES).build()).build(), bytes)
+                .withArray(entryBuilder.withName("records").withType(Schema.Type.ARRAY)
+                        .withElementSchema(recordBuilderFactory.newSchemaBuilder(Type.RECORD).build()).build(), records)
+                .build();
+        //
+        GenericRecord converted = converter.fromRecord(input);
+        assertNotNull(converted);
+        assertEquals(strings, converted.get("strings"));
+        assertEquals(integers, converted.get("integers"));
+        assertEquals(longs, converted.get("longs"));
+        assertEquals(floats, converted.get("floats"));
+        assertEquals(doubles, converted.get("doubles"));
+        assertEquals(booleans, converted.get("booleans"));
+        assertEquals(bytes, converted.get("bytes"));
+        List<GenericRecord> avroRecs = (List<GenericRecord>) converted.get("records");
+        assertNotNull(avroRecs);
+        assertEquals(2, avroRecs.size());
+        for (GenericRecord r : avroRecs) {
+            assertNotNull(r);
+            assertEquals("Bonjour", r.get("string1"));
+            assertEquals("Olà", r.get("string2"));
+            assertEquals(71, r.get("int"));
+            assertEquals(true, r.get("boolean"));
+            assertEquals(1971L, r.get("long"));
+            assertEquals(LocalDateTime.of(2019, 04, 22, 0, 0).atZone(ZoneOffset.UTC).toInstant().toEpochMilli(),
+                    r.get("datetime"));
+            assertEquals(20.5f, r.get("float"));
+            assertEquals(20.5, r.get("double"));
+        }
+        Record from = converter.toRecord(converted);
+        assertNotNull(from);
+        assertEquals(strings, from.getArray(String.class, "strings"));
+        assertEquals(integers, from.getArray(Integer.class, "integers"));
+        assertEquals(longs, from.getArray(Long.class, "longs"));
+        assertEquals(floats, from.getArray(Float.class, "floats"));
+        assertEquals(doubles, from.getArray(Double.class, "doubles"));
+        assertEquals(booleans, from.getArray(Boolean.class, "booleans"));
+        assertEquals(bytes, from.getArray(Byte.class, "bytes"));
+        List<Record> tckRecs = (List<Record>) from.getArray(Record.class, "records");
+        assertNotNull(tckRecs);
+        assertEquals(2, tckRecs.size());
+        for (Record r : tckRecs) {
+            assertNotNull(r);
+            assertEquals("Bonjour", r.getString("string1"));
+            assertEquals("Olà", r.getString("string2"));
+            assertEquals(71, r.getInt("int"));
+            assertEquals(true, r.getBoolean("boolean"));
+            assertEquals(1971L, r.getLong("long"));
+            assertEquals(LocalDateTime.of(2019, 04, 22, 0, 0).atZone(ZoneOffset.UTC).toInstant(),
+                    r.getDateTime("datetime").toInstant());
+            assertEquals(20.5f, r.getFloat("float"));
+            assertEquals(20.5, r.getDouble("double"));
+        }
+    }
+
+    @Test
+    void checkLogicalTypes() {
+        assertEquals(LogicalTypes.date().getName(), AvroConverter.AVRO_LOGICAL_TYPE_DATE);
+        assertEquals(LogicalTypes.timeMillis().getName(), AvroConverter.AVRO_LOGICAL_TYPE_TIME_MILLIS);
+        assertEquals(LogicalTypes.timestampMillis().getName(), AvroConverter.AVRO_LOGICAL_TYPE_TIMESTAMP_MILLIS);
     }
 }

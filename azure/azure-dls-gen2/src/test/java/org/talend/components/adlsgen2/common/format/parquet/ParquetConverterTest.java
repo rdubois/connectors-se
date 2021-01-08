@@ -30,7 +30,10 @@ import org.apache.parquet.hadoop.util.HadoopOutputFile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.talend.components.adlsgen2.AdlsGen2TestBase;
-import org.talend.components.adlsgen2.common.format.avro.AvroConfiguration;
+import org.talend.components.common.Constants;
+import org.talend.components.common.converters.ParquetConverter;
+import org.talend.components.common.formats.AvroConfiguration;
+import org.talend.components.common.formats.ParquetConfiguration;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.junit5.WithComponents;
 
@@ -42,14 +45,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @WithComponents("org.talend.components.adlsgen2")
 class ParquetConverterTest extends AdlsGen2TestBase {
 
-    private AvroConfiguration parquetConfiguration;
+    private ParquetConfiguration parquetConfiguration;
 
     private ParquetConverter converter;
 
     @BeforeEach
     protected void setUp() throws Exception {
         super.setUp();
-        converter = ParquetConverter.of(recordBuilderFactory, parquetConfiguration);
+        converter = ParquetConverter.of(recordBuilderFactory, parquetConfiguration, Constants.ADLS_NAMESPACE);
     }
 
     @Test

@@ -139,6 +139,10 @@ public class Constants {
 
     public static final String ATTR_IS_DIRECTORY = "isDirectory";
 
+    public static final String AZURE_BLOB_NAMESPACE = "org.talend.components.azureblob";
+
+    public static final String ADLS_NAMESPACE = "org.talend.components.adlsgen2";
+
     /**
      * Private Default Ctor
      */

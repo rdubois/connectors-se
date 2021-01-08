@@ -18,10 +18,10 @@ import static org.talend.sdk.component.api.configuration.ui.layout.GridLayout.Fo
 import java.io.Serializable;
 
 import org.talend.components.adlsgen2.common.format.FileFormat;
-import org.talend.components.adlsgen2.common.format.avro.AvroConfiguration;
+import org.talend.components.common.formats.AvroConfiguration;
 import org.talend.components.adlsgen2.common.format.csv.CsvConfiguration;
 import org.talend.components.adlsgen2.common.format.json.JsonConfiguration;
-import org.talend.components.adlsgen2.common.format.parquet.ParquetConfiguration;
+import org.talend.components.common.formats.ParquetConfiguration;
 import org.talend.components.adlsgen2.datastore.AdlsGen2Connection;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.configuration.action.Suggestable;
