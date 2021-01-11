@@ -30,7 +30,7 @@ import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericData.Array;
 import org.apache.avro.generic.GenericRecord;
-import org.talend.components.common.formats.AvroConfiguration;
+import org.talend.components.common.formats.AvroFormatOptions;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.record.Schema;
 import org.talend.sdk.component.api.record.Schema.Entry;
@@ -69,19 +69,19 @@ public class AvroConverter implements RecordConverter<GenericRecord> {
 
     private org.apache.avro.Schema avroSchema;
 
-    public static AvroConverter of(RecordBuilderFactory factory, AvroConfiguration config) {
+    public static AvroConverter of(RecordBuilderFactory factory, AvroFormatOptions config) {
         return new AvroConverter(factory, config);
     }
 
-    public static AvroConverter of(RecordBuilderFactory factory, AvroConfiguration config, String recordNamespace) {
+    public static AvroConverter of(RecordBuilderFactory factory, AvroFormatOptions config, String recordNamespace) {
         return new AvroConverter(factory, config, recordNamespace);
     }
 
-    protected AvroConverter(RecordBuilderFactory factory, AvroConfiguration configuration) {
+    protected AvroConverter(RecordBuilderFactory factory, AvroFormatOptions configuration) {
         this(factory, configuration, DEFAULT_RECORD_NAMESPACE);
     }
 
-    protected AvroConverter(RecordBuilderFactory factory, AvroConfiguration config, String currentRecordNamespace) {
+    protected AvroConverter(RecordBuilderFactory factory, AvroFormatOptions config, String currentRecordNamespace) {
         recordBuilderFactory = factory;
         if (currentRecordNamespace != null) {
             this.currentRecordNamespace = currentRecordNamespace;

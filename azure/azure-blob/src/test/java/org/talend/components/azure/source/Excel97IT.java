@@ -58,7 +58,7 @@ class Excel97IT extends BaseIT {
         ExcelFormatOptions excelFormatOptions = new ExcelFormatOptions();
         excelFormatOptions.setSheetName("Sheet1");
         excelFormatOptions.setExcelFormat(ExcelFormat.EXCEL97);
-        excelFormatOptions.setEncoding(Encoding.UFT8);
+        excelFormatOptions.setEncoding(Encoding.UTF8);
         dataset.setExcelOptions(excelFormatOptions);
 
         dataset.setContainerName(containerName);

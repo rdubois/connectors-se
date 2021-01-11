@@ -12,28 +12,27 @@
  */
 package org.talend.components.adlsgen2.input;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.talend.sdk.component.junit.SimpleFactory.configurationByExample;
-
 import java.util.Collection;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.talend.components.adlsgen2.AdlsGen2TestBase;
-import org.talend.components.adlsgen2.common.format.FileEncoding;
 import org.talend.components.adlsgen2.common.format.FileFormat;
-import org.talend.components.common.formats.AvroConfiguration;
-import org.talend.components.adlsgen2.common.format.csv.CsvConfiguration;
-import org.talend.components.adlsgen2.common.format.csv.CsvFieldDelimiter;
-import org.talend.components.adlsgen2.common.format.csv.CsvRecordSeparator;
-import org.talend.components.adlsgen2.common.format.json.JsonConfiguration;
-import org.talend.components.common.formats.ParquetConfiguration;
+import org.talend.components.common.formats.AvroFormatOptions;
+import org.talend.components.common.formats.Encoding;
+import org.talend.components.common.formats.JSONFormatOptions;
+import org.talend.components.common.formats.ParquetFormatOptions;
+import org.talend.components.common.formats.csv.CSVFieldDelimiter;
+import org.talend.components.common.formats.csv.CSVFormatOptionsWithSchema;
+import org.talend.components.common.formats.csv.CSVRecordDelimiter;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.junit5.WithComponents;
 import org.talend.sdk.component.runtime.manager.chain.Job;
 
 import lombok.extern.slf4j.Slf4j;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.talend.sdk.component.junit.SimpleFactory.configurationByExample;
 
 @Slf4j
 @WithComponents("org.talend.components.adlsgen2")
@@ -41,11 +40,11 @@ public class InputTestIT extends AdlsGen2TestBase {
 
     @Test
     void readCsvWithHeader() {
-        CsvConfiguration csvConfig = new CsvConfiguration();
-        csvConfig.setFieldDelimiter(CsvFieldDelimiter.SEMICOLON);
-        csvConfig.setRecordSeparator(CsvRecordSeparator.LF);
+        CSVFormatOptionsWithSchema csvConfig = new CSVFormatOptionsWithSchema();
+        csvConfig.getCsvFormatOptions().setFieldDelimiter(CSVFieldDelimiter.SEMICOLON);
+        csvConfig.getCsvFormatOptions().setRecordDelimiter(CSVRecordDelimiter.LF);
         csvConfig.setCsvSchema("IdCustomer;FirstName;lastname;address;enrolled;zip;state");
-        csvConfig.setHeader(true);
+        csvConfig.getCsvFormatOptions().setUseHeader(true);
         dataSet.setCsvConfiguration(csvConfig);
         dataSet.setBlobPath(basePathIn + "csv-w-header");
         inputConfiguration.setDataSet(dataSet);
@@ -64,11 +63,11 @@ public class InputTestIT extends AdlsGen2TestBase {
 
     @Test
     void readCsvWithoutHeader() {
-        CsvConfiguration csvConfig = new CsvConfiguration();
-        csvConfig.setFieldDelimiter(CsvFieldDelimiter.SEMICOLON);
-        csvConfig.setRecordSeparator(CsvRecordSeparator.LF);
+        CSVFormatOptionsWithSchema csvConfig = new CSVFormatOptionsWithSchema();
+        csvConfig.getCsvFormatOptions().setFieldDelimiter(CSVFieldDelimiter.SEMICOLON);
+        csvConfig.getCsvFormatOptions().setRecordDelimiter(CSVRecordDelimiter.LF);
         csvConfig.setCsvSchema("IdCustomer;FirstName;lastname;address;enrolled;zip;state");
-        csvConfig.setHeader(false);
+        csvConfig.getCsvFormatOptions().setUseHeader(false);
         dataSet.setCsvConfiguration(csvConfig);
         dataSet.setBlobPath(basePathIn + "csv-wo-header");
         inputConfiguration.setDataSet(dataSet);
@@ -88,7 +87,7 @@ public class InputTestIT extends AdlsGen2TestBase {
     @Test
     void readAvro() {
         dataSet.setFormat(FileFormat.AVRO);
-        AvroConfiguration avroConfig = new AvroConfiguration();
+        AvroFormatOptions avroConfig = new AvroFormatOptions();
         dataSet.setAvroConfiguration(avroConfig);
         dataSet.setBlobPath(basePathIn + "avro");
         inputConfiguration.setDataSet(dataSet);
@@ -108,7 +107,7 @@ public class InputTestIT extends AdlsGen2TestBase {
     @Test
     void readAvroBusiness() {
         dataSet.setFormat(FileFormat.AVRO);
-        AvroConfiguration avroConfig = new AvroConfiguration();
+        AvroFormatOptions avroConfig = new AvroFormatOptions();
         dataSet.setAvroConfiguration(avroConfig);
         dataSet.setBlobPath(basePathIn + "business-avro");
         inputConfiguration.setDataSet(dataSet);
@@ -163,7 +162,7 @@ public class InputTestIT extends AdlsGen2TestBase {
     @Test
     void readParquet() {
         dataSet.setFormat(FileFormat.PARQUET);
-        ParquetConfiguration parquetConfig = new ParquetConfiguration();
+        ParquetFormatOptions parquetConfig = new ParquetFormatOptions();
         dataSet.setAvroConfiguration(parquetConfig);
         dataSet.setBlobPath(basePathIn + "parquet");
         inputConfiguration.setDataSet(dataSet);
@@ -183,7 +182,7 @@ public class InputTestIT extends AdlsGen2TestBase {
     @Test
     void readAvroBigBusiness() {
         dataSet.setFormat(FileFormat.AVRO);
-        AvroConfiguration avroConfig = new AvroConfiguration();
+        AvroFormatOptions avroConfig = new AvroFormatOptions();
         dataSet.setAvroConfiguration(avroConfig);
         dataSet.setBlobPath(basePathIn + "big_business.avro");
         inputConfiguration.setDataSet(dataSet);
@@ -265,7 +264,7 @@ public class InputTestIT extends AdlsGen2TestBase {
 
     @Test
     void readJson() {
-        JsonConfiguration jsonConfig = new JsonConfiguration();
+        JSONFormatOptions jsonConfig = new JSONFormatOptions();
         dataSet.setFormat(FileFormat.JSON);
         dataSet.setJsonConfiguration(jsonConfig);
         dataSet.setBlobPath(basePathIn + "json");
@@ -285,7 +284,7 @@ public class InputTestIT extends AdlsGen2TestBase {
 
     @Test
     void blobPathIsFileInsteadOfFolder() {
-        AvroConfiguration avroConfig = new AvroConfiguration();
+        AvroFormatOptions avroConfig = new AvroFormatOptions();
         dataSet.setFormat(FileFormat.AVRO);
         dataSet.setAvroConfiguration(avroConfig);
         dataSet.setBlobPath(basePathIn + "business-avro/business.avro");
@@ -305,10 +304,10 @@ public class InputTestIT extends AdlsGen2TestBase {
 
     @Test
     void csvEncodedInSJis() {
-        CsvConfiguration csvConfiguration = new CsvConfiguration();
-        csvConfiguration.setRecordSeparator(CsvRecordSeparator.LF);
-        csvConfiguration.setFileEncoding(FileEncoding.OTHER);
-        csvConfiguration.setCustomFileEncoding("SJIS");
+        CSVFormatOptionsWithSchema csvConfiguration = new CSVFormatOptionsWithSchema();
+        csvConfiguration.getCsvFormatOptions().setRecordDelimiter(CSVRecordDelimiter.LF);
+        csvConfiguration.getCsvFormatOptions().setEncoding(Encoding.OTHER);
+        csvConfiguration.getCsvFormatOptions().setCustomEncoding("SJIS");
         dataSet.setFormat(FileFormat.CSV);
         dataSet.setCsvConfiguration(csvConfiguration);
         dataSet.setBlobPath(basePathIn + "encoding/SJIS-encoded.csv");
@@ -332,7 +331,7 @@ public class InputTestIT extends AdlsGen2TestBase {
     @Test
     void readAvroBusinessGeneratedBySink() {
         dataSet.setFormat(FileFormat.AVRO);
-        AvroConfiguration avroConfig = new AvroConfiguration();
+        AvroFormatOptions avroConfig = new AvroFormatOptions();
         dataSet.setAvroConfiguration(avroConfig);
         dataSet.setBlobPath(basePathOut + "business-avro");
         inputConfiguration.setDataSet(dataSet);

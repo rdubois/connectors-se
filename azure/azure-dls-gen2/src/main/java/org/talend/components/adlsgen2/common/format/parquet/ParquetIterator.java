@@ -29,7 +29,7 @@ import org.apache.parquet.hadoop.util.HadoopInputFile;
 import org.talend.components.adlsgen2.common.format.FileFormatRuntimeException;
 import org.talend.components.common.Constants;
 import org.talend.components.common.converters.ParquetConverter;
-import org.talend.components.common.formats.ParquetConfiguration;
+import org.talend.components.common.formats.ParquetFormatOptions;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.service.configuration.Configuration;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
@@ -95,7 +95,7 @@ public class ParquetIterator implements Iterator<Record>, Serializable {
 
         private ParquetConverter converter;
 
-        private ParquetConfiguration configuration;
+        private ParquetFormatOptions configuration;
 
         private RecordBuilderFactory factory;
 
@@ -108,7 +108,7 @@ public class ParquetIterator implements Iterator<Record>, Serializable {
         }
 
         public ParquetIterator.Builder withConfiguration(
-                @Configuration("parquetConfiguration") final ParquetConfiguration configuration) {
+                @Configuration("parquetConfiguration") final ParquetFormatOptions configuration) {
             this.configuration = configuration;
             converter = ParquetConverter.of(factory, configuration, Constants.ADLS_NAMESPACE);
 

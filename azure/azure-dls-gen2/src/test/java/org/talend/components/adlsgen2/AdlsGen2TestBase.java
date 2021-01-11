@@ -24,10 +24,7 @@ import org.hamcrest.Matchers;
 import org.junit.Assume;
 import org.junit.jupiter.api.BeforeEach;
 import org.talend.components.adlsgen2.common.format.FileFormat;
-import org.talend.components.adlsgen2.common.format.csv.CsvConfiguration;
 import org.talend.components.adlsgen2.common.format.csv.CsvConverter;
-import org.talend.components.adlsgen2.common.format.csv.CsvFieldDelimiter;
-import org.talend.components.adlsgen2.common.format.csv.CsvRecordSeparator;
 import org.talend.components.adlsgen2.dataset.AdlsGen2DataSet;
 import org.talend.components.adlsgen2.datastore.AdlsGen2Connection;
 import org.talend.components.adlsgen2.datastore.AdlsGen2Connection.AuthMethod;
@@ -39,6 +36,9 @@ import org.talend.components.adlsgen2.runtime.AdlsDatastoreRuntimeInfo;
 import org.talend.components.adlsgen2.service.AdlsActiveDirectoryService;
 import org.talend.components.adlsgen2.service.AdlsGen2Service;
 import org.talend.components.adlsgen2.service.I18n;
+import org.talend.components.common.formats.csv.CSVFieldDelimiter;
+import org.talend.components.common.formats.csv.CSVFormatOptionsWithSchema;
+import org.talend.components.common.formats.csv.CSVRecordDelimiter;
 import org.talend.sdk.component.api.DecryptedServer;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.record.Schema.Entry;
@@ -144,9 +144,9 @@ public class AdlsGen2TestBase implements Serializable {
 
         datasetRuntimeInfo = new AdlsDatasetRuntimeInfo(dataSet, tokenProviderService);
 
-        CsvConfiguration csvConfig = new CsvConfiguration();
-        csvConfig.setFieldDelimiter(CsvFieldDelimiter.SEMICOLON);
-        csvConfig.setRecordSeparator(CsvRecordSeparator.LF);
+        CSVFormatOptionsWithSchema csvConfig = new CSVFormatOptionsWithSchema();
+        csvConfig.getCsvFormatOptions().setFieldDelimiter(CSVFieldDelimiter.SEMICOLON);
+        csvConfig.getCsvFormatOptions().setRecordDelimiter(CSVRecordDelimiter.LF);
         csvConfig.setCsvSchema("id;firstname;lastname;address;enrolled;zip;state");
         dataSet.setCsvConfiguration(csvConfig);
 

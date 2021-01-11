@@ -69,7 +69,7 @@ public class CsvBlobReader extends BlobReader {
         private CSVFileRecordIterator(Iterable<BlobInformations> blobList, RecordBuilderFactory recordBuilderFactory,
                 AdlsGen2Service service) {
             super(blobList, recordBuilderFactory);
-            this.encodingValue = configuration.getDataSet().getCsvConfiguration().effectiveFileEncoding();
+            this.encodingValue = configuration.getDataSet().getCsvConfiguration().getCsvFormatOptions().effectiveFileEncoding();
             this.service = service;
             peekFirstBlob();
         }

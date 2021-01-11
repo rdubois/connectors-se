@@ -20,7 +20,7 @@ import org.apache.avro.generic.GenericRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.talend.components.common.converters.AvroConverter;
-import org.talend.components.common.formats.AvroConfiguration;
+import org.talend.components.common.formats.AvroFormatOptions;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
 import org.talend.sdk.component.junit.BaseComponentsHandler;
@@ -51,7 +51,7 @@ class AvroIteratorTest {
     @Test
     void withBigBusinessAvroFile() throws Exception {
         InputStream businessIs = getClass().getResource("/common/format/avro/big_business.avro").openStream();
-        AvroIterator iter = AvroIterator.Builder.of(recordBuilderFactory).withConfiguration(new AvroConfiguration())
+        AvroIterator iter = AvroIterator.Builder.of(recordBuilderFactory).withConfiguration(new AvroFormatOptions())
                 .parse(businessIs);
         Record first, last = null;
         first = iter.next();
@@ -198,7 +198,7 @@ class AvroIteratorTest {
     @Test
     void withNullData() throws Exception {
         InputStream business = getClass().getResource("/common/format/avro/null-data.avro").openStream();
-        AvroIterator iter = AvroIterator.Builder.of(recordBuilderFactory).withConfiguration(new AvroConfiguration())
+        AvroIterator iter = AvroIterator.Builder.of(recordBuilderFactory).withConfiguration(new AvroFormatOptions())
                 .parse(business);
         Record first = null;
         first = iter.next();
@@ -212,7 +212,7 @@ class AvroIteratorTest {
     @Test
     void withBusinessAvroFile() throws Exception {
         InputStream business = getClass().getResource("/common/format/avro/business.avro").openStream();
-        AvroIterator iter = AvroIterator.Builder.of(recordBuilderFactory).withConfiguration(new AvroConfiguration())
+        AvroIterator iter = AvroIterator.Builder.of(recordBuilderFactory).withConfiguration(new AvroFormatOptions())
                 .parse(business);
         Record first, last = null;
         first = iter.next();

@@ -24,6 +24,7 @@ import java.util.Iterator;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.talend.components.adlsgen2.common.format.FileFormatRuntimeException;
+import org.talend.components.common.formats.csv.CSVFormatOptionsWithSchema;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.service.configuration.Configuration;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
@@ -80,7 +81,7 @@ public class CsvIterator implements Iterator<Record>, Serializable {
 
         private CsvConverter converter;
 
-        private CsvConfiguration configuration;
+        private CSVFormatOptionsWithSchema configuration;
 
         private RecordBuilderFactory factory;
 
@@ -92,7 +93,7 @@ public class CsvIterator implements Iterator<Record>, Serializable {
             return new Builder(factory);
         }
 
-        public Builder withConfiguration(@Configuration("csvConfiguration") final CsvConfiguration configuration) {
+        public Builder withConfiguration(@Configuration("csvConfiguration") final CSVFormatOptionsWithSchema configuration) {
             log.debug("[Builder::withConfiguration] conf: {}", configuration);
             this.configuration = configuration;
             converter = CsvConverter.of(factory, configuration);
@@ -102,7 +103,8 @@ public class CsvIterator implements Iterator<Record>, Serializable {
 
         public CsvIterator parse(InputStream in) {
             try {
-                return new CsvIterator(converter, new InputStreamReader(in, configuration.effectiveFileEncoding()));
+                return new CsvIterator(converter,
+                        new InputStreamReader(in, configuration.getCsvFormatOptions().effectiveFileEncoding()));
             } catch (UnsupportedEncodingException e) {
                 log.error("[parse] {}", e.getMessage());
                 throw new FileFormatRuntimeException(e.getMessage());

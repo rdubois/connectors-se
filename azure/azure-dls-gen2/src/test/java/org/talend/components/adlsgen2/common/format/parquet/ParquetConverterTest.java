@@ -32,8 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.talend.components.adlsgen2.AdlsGen2TestBase;
 import org.talend.components.common.Constants;
 import org.talend.components.common.converters.ParquetConverter;
-import org.talend.components.common.formats.AvroConfiguration;
-import org.talend.components.common.formats.ParquetConfiguration;
+import org.talend.components.common.formats.ParquetFormatOptions;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.junit5.WithComponents;
 
@@ -45,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @WithComponents("org.talend.components.adlsgen2")
 class ParquetConverterTest extends AdlsGen2TestBase {
 
-    private ParquetConfiguration parquetConfiguration;
+    private ParquetFormatOptions parquetConfiguration;
 
     private ParquetConverter converter;
 

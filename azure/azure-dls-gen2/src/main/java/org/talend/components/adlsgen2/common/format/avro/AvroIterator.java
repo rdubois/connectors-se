@@ -23,7 +23,7 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumReader;
 import org.talend.components.adlsgen2.common.format.FileFormatRuntimeException;
 import org.talend.components.common.converters.AvroConverter;
-import org.talend.components.common.formats.AvroConfiguration;
+import org.talend.components.common.formats.AvroFormatOptions;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.service.configuration.Configuration;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
@@ -77,7 +77,7 @@ public class AvroIterator implements Iterator<Record>, Serializable {
 
         private AvroConverter converter;
 
-        private AvroConfiguration configuration;
+        private AvroFormatOptions configuration;
 
         private RecordBuilderFactory factory;
 
@@ -89,7 +89,7 @@ public class AvroIterator implements Iterator<Record>, Serializable {
             return new AvroIterator.Builder(factory);
         }
 
-        public AvroIterator.Builder withConfiguration(@Configuration("avroConfiguration") final AvroConfiguration configuration) {
+        public AvroIterator.Builder withConfiguration(@Configuration("avroConfiguration") final AvroFormatOptions configuration) {
             this.configuration = configuration;
             converter = AvroConverter.of(factory, configuration);
 

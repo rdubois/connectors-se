@@ -13,7 +13,13 @@
 package org.talend.components.common.formats.csv;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.talend.components.common.formats.Encoding;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.configuration.condition.ActiveIf;
@@ -21,17 +27,22 @@ import org.talend.sdk.component.api.configuration.ui.layout.GridLayout;
 import org.talend.sdk.component.api.meta.Documentation;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
-@GridLayout(value = { @GridLayout.Row("recordDelimiter"), @GridLayout.Row("customRecordDelimiter"),
-        @GridLayout.Row("fieldDelimiter"), @GridLayout.Row("customFieldDelimiter"), @GridLayout.Row("textEnclosureCharacter"),
-        @GridLayout.Row("escapeCharacter"), @GridLayout.Row("encoding"), @GridLayout.Row("customEncoding"),
+@Slf4j
+@GridLayout(value = { //
+        @GridLayout.Row("recordDelimiter"), @GridLayout.Row("customRecordDelimiter"), //
+        @GridLayout.Row("fieldDelimiter"), @GridLayout.Row("customFieldDelimiter"), @GridLayout.Row("textEnclosureCharacter"), //
+        @GridLayout.Row("escapeCharacter"), @GridLayout.Row("encoding"), @GridLayout.Row("customEncoding"), //
         @GridLayout.Row("useHeader"), @GridLayout.Row("header") })
 @Data
 public class CSVFormatOptions implements Serializable {
 
+    private static final long serialVersionUID = -3030939392498621435L;
+
     @Option
     @Documentation("Symbol(s) used to separate records")
-    private RecordDelimiter recordDelimiter = RecordDelimiter.CRLF;
+    private CSVRecordDelimiter recordDelimiter = CSVRecordDelimiter.CRLF;
 
     @Option
     @ActiveIf(target = "recordDelimiter", value = "OTHER")
@@ -40,7 +51,7 @@ public class CSVFormatOptions implements Serializable {
 
     @Option
     @Documentation("Symbol(s) used to separate fields")
-    private FieldDelimiter fieldDelimiter = FieldDelimiter.SEMICOLON;
+    private CSVFieldDelimiter fieldDelimiter = CSVFieldDelimiter.SEMICOLON;
 
     @Option
     @ActiveIf(target = "fieldDelimiter", value = "OTHER")
@@ -57,7 +68,7 @@ public class CSVFormatOptions implements Serializable {
 
     @Option
     @Documentation("Encoding")
-    private Encoding encoding = Encoding.UFT8;
+    private Encoding encoding = Encoding.UTF8;
 
     @Option
     @ActiveIf(target = "encoding", value = "OTHER")
@@ -74,4 +85,29 @@ public class CSVFormatOptions implements Serializable {
     // @Min(-0.0)
     // TODO min doesn't work correctly yet
     private int header = 1;
+
+    public char effectiveFieldDelimiter() {
+        return CSVFieldDelimiter.OTHER.equals(getFieldDelimiter()) ? getCustomFieldDelimiter().charAt(0)
+                : getFieldDelimiter().getDelimiterValue();
+    }
+
+    public String effectiveFileEncoding() {
+        if (Encoding.OTHER == getEncoding()) {
+            try {
+                Charset.forName(customEncoding);
+                return getCustomEncoding();
+            } catch (Exception e) {
+                String msg = String.format("Encoding not supported %s.", getCustomEncoding());
+                log.error("[effectiveFileEncoding] {}", msg);
+                throw new RuntimeException(msg);
+            }
+        } else {
+            return getEncoding().getEncodingCharsetValue();
+        }
+    }
+
+    public String effectiveRecordSeparator() {
+        return CSVRecordDelimiter.OTHER.equals(getRecordDelimiter()) ? getCustomRecordDelimiter()
+                : getRecordDelimiter().getDelimiterValue();
+    }
 }

@@ -12,17 +12,14 @@
  */
 package org.talend.components.adlsgen2.dataset;
 
-import static org.talend.components.adlsgen2.service.UIActionService.ACTION_FILESYSTEMS;
-import static org.talend.sdk.component.api.configuration.ui.layout.GridLayout.FormType.ADVANCED;
-
 import java.io.Serializable;
 
 import org.talend.components.adlsgen2.common.format.FileFormat;
-import org.talend.components.common.formats.AvroConfiguration;
-import org.talend.components.adlsgen2.common.format.csv.CsvConfiguration;
-import org.talend.components.adlsgen2.common.format.json.JsonConfiguration;
-import org.talend.components.common.formats.ParquetConfiguration;
 import org.talend.components.adlsgen2.datastore.AdlsGen2Connection;
+import org.talend.components.common.formats.AvroFormatOptions;
+import org.talend.components.common.formats.JSONFormatOptions;
+import org.talend.components.common.formats.ParquetFormatOptions;
+import org.talend.components.common.formats.csv.CSVFormatOptionsWithSchema;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.configuration.action.Suggestable;
 import org.talend.sdk.component.api.configuration.condition.ActiveIf;
@@ -33,6 +30,8 @@ import org.talend.sdk.component.api.configuration.ui.layout.GridLayout;
 import org.talend.sdk.component.api.meta.Documentation;
 
 import lombok.Data;
+import static org.talend.components.adlsgen2.service.UIActionService.ACTION_FILESYSTEMS;
+import static org.talend.sdk.component.api.configuration.ui.layout.GridLayout.FormType.ADVANCED;
 
 @Data
 @DataSet("AdlsGen2DataSet")
@@ -74,20 +73,20 @@ public class AdlsGen2DataSet implements Serializable {
 
     @Option
     @ActiveIf(target = "format", value = "CSV")
-    private CsvConfiguration csvConfiguration;
+    private CSVFormatOptionsWithSchema csvConfiguration;
 
     // next options are temporarily hidden because they generate unwanted fields in studio
     // (empty file format configurations)
     @Option
     @ActiveIf(target = "format", value = "AVRO_ENABLED")
-    private AvroConfiguration avroConfiguration;
+    private AvroFormatOptions avroConfiguration;
 
     @Option
     @ActiveIf(target = "format", value = "PARQUET_ENABLED")
-    private ParquetConfiguration parquetConfiguration;
+    private ParquetFormatOptions parquetConfiguration;
 
     @Option
     @ActiveIf(target = "format", value = "JSON_ENABLED")
-    private JsonConfiguration jsonConfiguration;
+    private JSONFormatOptions jsonConfiguration;
 
 }

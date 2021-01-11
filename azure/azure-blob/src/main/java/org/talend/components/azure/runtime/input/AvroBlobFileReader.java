@@ -26,7 +26,7 @@ import org.talend.components.common.Constants;
 import org.talend.components.common.converters.AvroConverter;
 import org.talend.components.azure.service.AzureBlobComponentServices;
 import org.talend.components.azure.service.MessageService;
-import org.talend.components.common.formats.AvroConfiguration;
+import org.talend.components.common.formats.AvroFormatOptions;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
 
@@ -37,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AvroBlobFileReader extends BlobFileReader {
 
-    private AvroConfiguration config;
+    private AvroFormatOptions config;
 
     public AvroBlobFileReader(AzureBlobDataset config, RecordBuilderFactory recordBuilderFactory,
             AzureBlobComponentServices connectionServices, MessageService messageService)

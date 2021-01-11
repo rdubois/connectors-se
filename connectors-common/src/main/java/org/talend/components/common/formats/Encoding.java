@@ -12,18 +12,15 @@
  */
 package org.talend.components.common.formats;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@AllArgsConstructor
 public enum Encoding {
-    UFT8("UTF-8"),
+    UTF8("UTF-8"),
     ISO_8859_15("ISO-8859-15"),
     OTHER("");
 
-    Encoding(String encodingCharsetValue) {
-        this.encodingCharsetValue = encodingCharsetValue;
-    }
-
+    @Getter
     private String encodingCharsetValue;
-
-    public String getEncodingValue() {
-        return encodingCharsetValue;
-    }
 }

@@ -22,6 +22,8 @@ import javax.json.JsonObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.talend.components.adlsgen2.AdlsGen2TestBase;
+import org.talend.components.common.converters.JsonConverter;
+import org.talend.components.common.formats.JSONFormatOptions;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.record.Schema;
 import org.talend.sdk.component.junit5.WithComponents;
@@ -44,7 +46,7 @@ class JsonConverterTest extends AdlsGen2TestBase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        converter = JsonConverter.of(recordBuilderFactory, jsonBuilderFactory, new JsonConfiguration());
+        converter = JsonConverter.of(recordBuilderFactory, jsonBuilderFactory, new JSONFormatOptions());
         String sample = getClass().getResource("/common/format/json/sample.json").getPath();
         json = Json.createParser(new InputStreamReader(new FileInputStream(sample))).getObject();
     }

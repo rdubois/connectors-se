@@ -19,7 +19,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.json.Json;
 import javax.json.JsonBuilderFactory;
@@ -28,7 +27,7 @@ import javax.json.JsonStructure;
 import javax.json.JsonValue;
 import javax.json.JsonValue.ValueType;
 
-import org.talend.components.adlsgen2.common.format.json.JsonConverter;
+import org.talend.components.common.converters.JsonConverter;
 import org.talend.components.adlsgen2.input.InputConfiguration;
 import org.talend.components.adlsgen2.runtime.AdlsGen2RuntimeException;
 import org.talend.components.adlsgen2.service.AdlsActiveDirectoryService;

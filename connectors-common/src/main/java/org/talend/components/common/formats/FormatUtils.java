@@ -13,8 +13,8 @@
 package org.talend.components.common.formats;
 
 import org.talend.components.common.formats.csv.CSVFormatOptions;
-import org.talend.components.common.formats.csv.FieldDelimiter;
-import org.talend.components.common.formats.csv.RecordDelimiter;
+import org.talend.components.common.formats.csv.CSVFieldDelimiter;
+import org.talend.components.common.formats.csv.CSVRecordDelimiter;
 import org.talend.components.common.formats.excel.ExcelFormatOptions;
 
 public class FormatUtils {
@@ -22,22 +22,22 @@ public class FormatUtils {
     public static String getUsedEncodingValue(CSVFormatOptions csvFormat) {
 
         return csvFormat.getEncoding() == Encoding.OTHER ? csvFormat.getCustomEncoding()
-                : csvFormat.getEncoding().getEncodingValue();
+                : csvFormat.getEncoding().getEncodingCharsetValue();
     }
 
     public static String getUsedEncodingValue(ExcelFormatOptions excelFormat) {
 
         return excelFormat.getEncoding() == Encoding.OTHER ? excelFormat.getCustomEncoding()
-                : excelFormat.getEncoding().getEncodingValue();
+                : excelFormat.getEncoding().getEncodingCharsetValue();
     }
 
     public static char getFieldDelimiterValue(CSVFormatOptions config) {
-        return config.getFieldDelimiter() == FieldDelimiter.OTHER ? config.getCustomFieldDelimiter().charAt(0)
+        return config.getFieldDelimiter() == CSVFieldDelimiter.OTHER ? config.getCustomFieldDelimiter().charAt(0)
                 : config.getFieldDelimiter().getDelimiterValue();
     }
 
     public static String getRecordDelimiterValue(CSVFormatOptions config) {
-        return config.getRecordDelimiter() == RecordDelimiter.OTHER ? config.getCustomRecordDelimiter()
+        return config.getRecordDelimiter() == CSVRecordDelimiter.OTHER ? config.getCustomRecordDelimiter()
                 : config.getRecordDelimiter().getDelimiterValue();
     }
 }

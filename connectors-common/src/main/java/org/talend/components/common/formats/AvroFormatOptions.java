@@ -10,20 +10,15 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.talend.components.common.formats.csv;
+package org.talend.components.common.formats;
 
-import lombok.Getter;
+import java.io.Serializable;
 
-public enum RecordDelimiter {
-    LF("\n"),
-    CR("\r"),
-    CRLF("\r\n"),
-    OTHER("");
+import org.talend.sdk.component.api.meta.Documentation;
 
-    @Getter
-    private String delimiterValue;
+import lombok.Data;
 
-    RecordDelimiter(String delimiter) {
-        this.delimiterValue = delimiter;
-    }
+@Data
+@Documentation("Avro Configuration")
+public class AvroFormatOptions implements Serializable {
 }

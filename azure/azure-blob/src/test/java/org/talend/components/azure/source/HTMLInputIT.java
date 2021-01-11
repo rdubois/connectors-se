@@ -45,7 +45,7 @@ class HTMLInputIT extends BaseIT {
         dataset.setFileFormat(FileFormat.EXCEL);
         ExcelFormatOptions excelFormatOptions = new ExcelFormatOptions();
         excelFormatOptions.setExcelFormat(ExcelFormat.HTML);
-        excelFormatOptions.setEncoding(Encoding.UFT8);
+        excelFormatOptions.setEncoding(Encoding.UTF8);
         dataset.setExcelOptions(excelFormatOptions);
 
         dataset.setContainerName(containerName);

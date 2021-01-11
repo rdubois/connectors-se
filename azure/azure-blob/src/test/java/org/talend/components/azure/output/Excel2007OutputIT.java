@@ -53,7 +53,7 @@ public class Excel2007OutputIT extends BaseIT {
         ExcelFormatOptions excelFormatOptions = new ExcelFormatOptions();
         excelFormatOptions.setExcelFormat(ExcelFormat.EXCEL2007);
         excelFormatOptions.setSheetName("Sheet1");
-        excelFormatOptions.setEncoding(Encoding.UFT8);
+        excelFormatOptions.setEncoding(Encoding.UTF8);
 
         dataset.setExcelOptions(excelFormatOptions);
         dataset.setContainerName(containerName);

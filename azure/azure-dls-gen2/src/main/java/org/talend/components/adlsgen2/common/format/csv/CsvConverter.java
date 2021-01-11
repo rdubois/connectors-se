@@ -22,7 +22,8 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.csv.QuoteMode;
 import org.apache.commons.lang3.StringUtils;
-import org.talend.components.adlsgen2.common.converter.RecordConverter;
+import org.talend.components.common.converters.RecordConverter;
+import org.talend.components.common.formats.csv.CSVFormatOptionsWithSchema;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.record.Schema;
 import org.talend.sdk.component.api.service.configuration.Configuration;
@@ -47,7 +48,7 @@ public class CsvConverter implements RecordConverter<CSVRecord>, Serializable {
     private Map<String, Integer> runtimeHeaders;
 
     private CsvConverter(final RecordBuilderFactory factory,
-            final @Configuration("csvConfiguration") CsvConfiguration configuration) {
+            final @Configuration("csvConfiguration") CSVFormatOptionsWithSchema configuration) {
         recordBuilderFactory = factory;
         csvFormat = formatWithConfiguration(configuration);
         schema = schemaWithConfiguration(configuration);
@@ -55,11 +56,11 @@ public class CsvConverter implements RecordConverter<CSVRecord>, Serializable {
     }
 
     public static CsvConverter of(final RecordBuilderFactory factory,
-            final @Configuration("csvConfiguration") CsvConfiguration configuration) {
+            final @Configuration("csvConfiguration") CSVFormatOptionsWithSchema configuration) {
         return new CsvConverter(factory, configuration);
     }
 
-    private Schema schemaWithConfiguration(CsvConfiguration configuration) {
+    private Schema schemaWithConfiguration(CSVFormatOptionsWithSchema configuration) {
         if (StringUtils.isEmpty(configuration.getCsvSchema())) {
             // will infer schema on runtime
             return null;
@@ -67,7 +68,8 @@ public class CsvConverter implements RecordConverter<CSVRecord>, Serializable {
         Schema.Builder builder = recordBuilderFactory.newSchemaBuilder(Schema.Type.RECORD);
         Set<String> existNames = new HashSet<>();
         int index = 0;
-        for (String s : configuration.getCsvSchema().split(String.valueOf(configuration.effectiveFieldDelimiter()))) {
+        for (String s : configuration.getCsvSchema()
+                .split(String.valueOf(configuration.getCsvFormatOptions().effectiveFieldDelimiter()))) {
             Schema.Entry.Builder entryBuilder = recordBuilderFactory.newEntryBuilder();
             String finalName = RecordConverter.getCorrectSchemaFieldName(s, index++, existNames);
             existNames.add(finalName);
@@ -77,12 +79,12 @@ public class CsvConverter implements RecordConverter<CSVRecord>, Serializable {
         return builder.build();
     }
 
-    private CSVFormat formatWithConfiguration(@Configuration("csvConfiguration") final CsvConfiguration configuration) {
+    private CSVFormat formatWithConfiguration(@Configuration("csvConfiguration") final CSVFormatOptionsWithSchema configuration) {
         log.debug("[CsvConverter::formatWithConfiguration] {}", configuration);
-        char delimiter = configuration.effectiveFieldDelimiter();
-        String separator = configuration.effectiveRecordSeparator();
-        String escape = configuration.getEscapeCharacter();
-        String enclosure = configuration.getTextEnclosureCharacter();
+        char delimiter = configuration.getCsvFormatOptions().effectiveFieldDelimiter();
+        String separator = configuration.getCsvFormatOptions().effectiveRecordSeparator();
+        String escape = configuration.getCsvFormatOptions().getEscapeCharacter();
+        String enclosure = configuration.getCsvFormatOptions().getTextEnclosureCharacter();
         String confSchema = configuration.getCsvSchema();
         CSVFormat format = CSVFormat.DEFAULT;
         // delimiter
@@ -104,11 +106,11 @@ public class CsvConverter implements RecordConverter<CSVRecord>, Serializable {
             format = format.withQuote(null);
         }
         // first line is header
-        if (configuration.isHeader()) {
+        if (configuration.getCsvFormatOptions().isUseHeader()) {
             format = format.withFirstRecordAsHeader();
         }
         // header columns
-        if (configuration.isHeader() && StringUtils.isNotEmpty(confSchema)) {
+        if (configuration.getCsvFormatOptions().isUseHeader() && StringUtils.isNotEmpty(confSchema)) {
             format = format.withHeader(confSchema.split(String.valueOf(delimiter)));
         }
 

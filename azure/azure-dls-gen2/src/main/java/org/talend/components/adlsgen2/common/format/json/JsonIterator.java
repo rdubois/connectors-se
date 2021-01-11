@@ -29,6 +29,8 @@ import javax.json.JsonStructure;
 import javax.json.JsonValue;
 import javax.json.JsonValue.ValueType;
 
+import org.talend.components.common.converters.JsonConverter;
+import org.talend.components.common.formats.JSONFormatOptions;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.service.configuration.Configuration;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
@@ -97,7 +99,7 @@ public class JsonIterator implements Iterator<Record>, Serializable {
 
         private JsonConverter converter;
 
-        private JsonConfiguration configuration;
+        private JSONFormatOptions configuration;
 
         private RecordBuilderFactory factory;
 
@@ -112,7 +114,7 @@ public class JsonIterator implements Iterator<Record>, Serializable {
             return new JsonIterator.Builder(factory, jsonFactory);
         }
 
-        public JsonIterator.Builder withConfiguration(final @Configuration("jsonConfiguration") JsonConfiguration configuration) {
+        public JsonIterator.Builder withConfiguration(final @Configuration("jsonConfiguration") JSONFormatOptions configuration) {
             this.configuration = configuration;
             converter = JsonConverter.of(factory, jsonFactory, configuration);
 

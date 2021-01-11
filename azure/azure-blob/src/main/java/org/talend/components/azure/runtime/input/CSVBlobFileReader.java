@@ -69,7 +69,7 @@ public class CSVBlobFileReader extends BlobFileReader {
             super(blobItemsList, recordBuilderFactory);
             this.encodingValue = getConfig().getCsvOptions().getEncoding() == Encoding.OTHER
                     ? getConfig().getCsvOptions().getCustomEncoding()
-                    : getConfig().getCsvOptions().getEncoding().getEncodingValue();
+                    : getConfig().getCsvOptions().getEncoding().getEncodingCharsetValue();
 
             takeFirstItem();
         }

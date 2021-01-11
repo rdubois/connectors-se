@@ -21,10 +21,10 @@ import java.util.List;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.StringUtils;
-import org.talend.components.adlsgen2.common.format.csv.CsvConfiguration;
 import org.talend.components.adlsgen2.common.format.csv.CsvConverter;
 import org.talend.components.adlsgen2.output.OutputConfiguration;
 import org.talend.components.adlsgen2.runtime.AdlsGen2RuntimeException;
+import org.talend.components.common.formats.csv.CSVFormatOptionsWithSchema;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.record.Schema;
@@ -37,7 +37,7 @@ public class CsvContentFormatter extends AbstractContentFormatter {
 
     private final OutputConfiguration configuration;
 
-    private final CsvConfiguration csvConfiguration;
+    private final CSVFormatOptionsWithSchema csvConfiguration;
 
     private final CSVFormat format;
 
@@ -63,7 +63,7 @@ public class CsvContentFormatter extends AbstractContentFormatter {
         StringWriter stringWriter = new StringWriter();
         try {
             CSVPrinter printer = new CSVPrinter(stringWriter, format);
-            if (csvConfiguration.isHeader()) {
+            if (csvConfiguration.getCsvFormatOptions().isUseHeader()) {
                 printer.printRecord(getHeader());
             }
             for (Record record : records) {
@@ -71,7 +71,7 @@ public class CsvContentFormatter extends AbstractContentFormatter {
             }
             printer.flush();
             printer.close();
-            return stringWriter.toString().getBytes(csvConfiguration.effectiveFileEncoding());
+            return stringWriter.toString().getBytes(csvConfiguration.getCsvFormatOptions().effectiveFileEncoding());
         } catch (IOException e) {
             log.error("[feedContent] {}", e.getMessage());
             throw new AdlsGen2RuntimeException(e.getMessage());

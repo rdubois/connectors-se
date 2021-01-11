@@ -43,7 +43,7 @@ public class ExcelFormatOptions implements Serializable {
     @Option
     @ActiveIf(target = "excelFormat", value = "HTML")
     @Documentation("")
-    private Encoding encoding = Encoding.UFT8;
+    private Encoding encoding = Encoding.UTF8;
 
     @Option
     @ActiveIfs({ @ActiveIf(target = "excelFormat", value = "HTML"), @ActiveIf(target = "encoding", value = "OTHER") })

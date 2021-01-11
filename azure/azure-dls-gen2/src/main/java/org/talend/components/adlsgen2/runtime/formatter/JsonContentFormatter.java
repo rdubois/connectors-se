@@ -17,7 +17,7 @@ import java.util.List;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonBuilderFactory;
 
-import org.talend.components.adlsgen2.common.format.json.JsonConverter;
+import org.talend.components.common.converters.JsonConverter;
 import org.talend.components.adlsgen2.output.OutputConfiguration;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.record.Record;

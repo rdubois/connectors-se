@@ -13,7 +13,7 @@
 package org.talend.components.common.converters;
 
 import org.apache.avro.generic.GenericRecord;
-import org.talend.components.common.formats.ParquetConfiguration;
+import org.talend.components.common.formats.ParquetFormatOptions;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
 
 public class ParquetConverter extends AvroConverter implements RecordConverter<GenericRecord> {
@@ -22,7 +22,7 @@ public class ParquetConverter extends AvroConverter implements RecordConverter<G
         return new ParquetConverter(recordBuilderFactory, DEFAULT_RECORD_NAMESPACE);
     }
 
-    public static ParquetConverter of(RecordBuilderFactory recordBuilderFactory, ParquetConfiguration config,
+    public static ParquetConverter of(RecordBuilderFactory recordBuilderFactory, ParquetFormatOptions config,
             String recordNameSpace) {
         return new ParquetConverter(recordBuilderFactory, recordNameSpace);
     }
