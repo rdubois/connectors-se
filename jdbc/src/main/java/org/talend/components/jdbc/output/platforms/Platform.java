@@ -17,11 +17,16 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.talend.components.jdbc.configuration.DistributionStrategy;
+import org.talend.components.jdbc.configuration.JdbcConfiguration;
 import org.talend.components.jdbc.configuration.RedshiftSortStrategy;
+import org.talend.components.jdbc.datastore.JdbcConnection;
 import org.talend.components.jdbc.service.I18nMessage;
 import org.talend.components.jdbc.service.JdbcService;
 import org.talend.sdk.component.api.record.Record;
@@ -45,7 +50,10 @@ public abstract class Platform implements Serializable {
 
     private final I18nMessage i18n;
 
-    protected Platform(I18nMessage i18n) {
+    private final JdbcConfiguration.Driver driver;
+
+    protected Platform(final I18nMessage i18n, final JdbcConfiguration.Driver driver) {
+        this.driver = driver;
         this.i18n = i18n;
     }
 
@@ -60,6 +68,17 @@ public abstract class Platform implements Serializable {
      * @return true if the error is because the table already exist
      */
     protected abstract boolean isTableExistsCreationError(final Throwable e);
+
+    public String buildUrl(final JdbcConnection.JDBCUrl config) {
+        if (config.getSetRawUrl()) {
+            return config.getRawUrl();
+        }
+
+        final String params = Optional.ofNullable(config.getParameters()).orElse(new ArrayList<>()).stream()
+                .map(p -> p.getKey() + "=" + p.getValue()).collect(Collectors.joining("&"));
+        return (config.getDefineProtocol() ? config.getProtocol() : this.getDriver().getProtocol()) + "://" + config.getHost()
+                + ":" + config.getPort() + "/" + config.getDatabase() + "?" + params;
+    }
 
     public void createTableIfNotExist(final Connection connection, final String name, final List<String> keys,
             final RedshiftSortStrategy sortStrategy, final List<String> sortKeys, final DistributionStrategy distributionStrategy,
@@ -134,7 +153,7 @@ public abstract class Platform implements Serializable {
 
     /**
      * Add platform related properties to jdbc connections
-     * 
+     *
      * @param dataSource the data source object to be configured
      */
     public void addDataSourceProperties(final HikariDataSource dataSource) {

@@ -15,6 +15,7 @@ package org.talend.components.jdbc.dataset;
 import lombok.Data;
 import lombok.experimental.Delegate;
 import org.talend.components.jdbc.datastore.JdbcConnection;
+import org.talend.components.jdbc.output.platforms.Platform;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.configuration.action.Suggestable;
 import org.talend.sdk.component.api.configuration.constraint.Required;
@@ -25,7 +26,6 @@ import org.talend.sdk.component.api.meta.Documentation;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.talend.components.jdbc.output.platforms.PlatformFactory.get;
 import static org.talend.components.jdbc.service.UIActionService.ACTION_SUGGESTION_TABLE_NAMES;
 import static org.talend.sdk.component.api.configuration.ui.layout.GridLayout.FormType.ADVANCED;
 
@@ -61,32 +61,32 @@ public class ChangeDataCaptureDataset implements BaseDataSet {
     private AdvancedCommon advancedCommon = new AdvancedCommon();
 
     @Override
-    public String getQuery() {
+    public String getQuery(final Platform platform) {
         // No need for the i18n service for this instance
-        return "select * from " + get(connection, null).identifier(getStreamTableName());
+        return "select * from " + platform.identifier(getStreamTableName());
     }
 
     // Snowflake CDC specific !!!
-    public String createStreamTableIfNotExist() {
-        return "create stream if not exists " + getQN(streamTableName) + " on table " + getQN(tableName);
+    public String createStreamTableIfNotExist(final Platform platform) {
+        return "create stream if not exists " + getQN(platform, streamTableName) + " on table " + getQN(platform, tableName);
     }
 
     // Snowflake CDC specific !!!
-    public String createCounterTableIfNotExist() {
-        return "create table if not exists " + getQN(getCounterTableName(streamTableName)) + "(c number(8))";
+    public String createCounterTableIfNotExist(final Platform platform) {
+        return "create table if not exists " + getQN(platform, getCounterTableName(streamTableName)) + "(c number(8))";
     }
 
-    public String createStatementConsumeStreamTable() {
-        return "insert into " + getQN(getCounterTableName(streamTableName)) + "(c) " + " select count(*) from "
-                + getQN(streamTableName);
+    public String createStatementConsumeStreamTable(final Platform platform) {
+        return "insert into " + getQN(platform, getCounterTableName(streamTableName)) + "(c) " + " select count(*) from "
+                + getQN(platform, streamTableName);
     }
 
     private String getCounterTableName(String streamTableName) {
         return streamTableName + "_COUNTER";
     }
 
-    private String getQN(String table) {
-        String jdbcUrl = connection.getJdbcUrl();
+    private String getQN(final Platform platform, final String table) {
+        String jdbcUrl = platform.buildUrl(connection.getJdbcUrl());
         String[] splitParts = jdbcUrl.split("\\?");
         if (splitParts.length == 1)
             return table;

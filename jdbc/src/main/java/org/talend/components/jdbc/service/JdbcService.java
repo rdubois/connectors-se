@@ -17,7 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.talend.components.jdbc.configuration.JdbcConfiguration;
 import org.talend.components.jdbc.datastore.JdbcConnection;
-import org.talend.components.jdbc.output.platforms.PlatformFactory;
+import org.talend.components.jdbc.output.platforms.Platform;
 import org.talend.sdk.component.api.service.Service;
 import org.talend.sdk.component.api.service.configuration.Configuration;
 import org.talend.sdk.component.api.service.configuration.LocalConfiguration;
@@ -62,13 +62,15 @@ public class JdbcService {
     @Service
     private LocalConfiguration localConfiguration;
 
+    @Service
+    private PlatformFactory platformFactory;
+
     public boolean driverNotDisabled(JdbcConfiguration.Driver driver) {
         return !ofNullable(localConfiguration.get("jdbc.driver." + driver.getId().toLowerCase(Locale.ROOT) + ".skip"))
                 .map(Boolean::valueOf).orElse(false);
     }
 
     /**
-     *
      * @param query the query to check
      * @return return false if the sql query is not a read only query, true otherwise
      */
@@ -76,12 +78,37 @@ public class JdbcService {
         return query != null && !READ_ONLY_QUERY_PATTERN.matcher(query.trim()).matches();
     }
 
-    private JdbcConfiguration.Driver getDriver(final JdbcConnection dataStore) {
-        return jdbcConfiguration.get().getDrivers().stream().filter(this::driverNotDisabled)
-                .filter(d -> d.getId()
-                        .equals(ofNullable(dataStore.getHandler()).filter(h -> !h.isEmpty()).orElse(dataStore.getDbType())))
-                .filter(d -> d.getHandlers() == null || d.getHandlers().isEmpty()).findFirst()
-                .orElseThrow(() -> new IllegalStateException(i18n.errorDriverNotFound(dataStore.getDbType())));
+    public JdbcConfiguration.Driver getDriver(final JdbcConnection dataStore) {
+        return getDriver(dataStore.getDbType(), dataStore.getHandler());
+    }
+
+    private JdbcConfiguration.Driver getDriver(final String dbType, final String handler) {
+        JdbcConfiguration.Driver driver = jdbcConfiguration.get().getDrivers().stream().filter(this::driverNotDisabled)
+                .filter(d -> d.getId().equals(dbType)).findFirst()
+                .orElseThrow(() -> new IllegalStateException(i18n.errorDriverNotFound(dbType)));
+
+        // We can get a configuration with a previous selected handler which is not related to selected driver
+        // So we check handler only if it is defined in the found driver
+        if (driver.getHandlers().contains(handler)) {
+            driver = getDriver(handler, null); // jdbcConfiguration.get().getDrivers().stream().filter(d ->
+                                               // d.getId().equals(handler)).findFirst().orElse(null);
+        }
+
+        return driver;
+    }
+
+    /*
+     * public JdbcConfiguration.Driver _getDriver(final String id) {
+     * return jdbcConfiguration.get().getDrivers().stream().filter(this::driverNotDisabled)
+     * .filter(d -> d.getId()
+     * .equals(ofNullable(dataStore.getHandler()).filter(h -> !h.isEmpty()).orElse(dataStore.getDbType())))
+     * .filter(d -> d.getHandlers() == null || d.getHandlers().isEmpty()).findFirst()
+     * .orElseThrow(() -> new IllegalStateException(i18n.errorDriverNotFound(dataStore.getDbType())));
+     * }
+     */
+
+    public Platform getPlatform(final JdbcConnection dataStore) {
+        return this.platformFactory.get(this.getDriver(dataStore), i18n);
     }
 
     public static boolean checkTableExistence(final String tableName, final JdbcService.JdbcDatasource dataSource)
@@ -106,27 +133,33 @@ public class JdbcService {
     }
 
     public JdbcDatasource createDataSource(final JdbcConnection connection) {
-        return new JdbcDatasource(i18n, resolver, connection, getDriver(connection), false, false);
+        return new JdbcDatasource(getPlatform(connection), i18n, resolver, connection, getDriver(connection), false, false);
     }
 
     public JdbcDatasource createDataSource(final JdbcConnection connection, final boolean rewriteBatchedStatements) {
-        return new JdbcDatasource(i18n, resolver, connection, getDriver(connection), false, rewriteBatchedStatements);
+        return new JdbcDatasource(getPlatform(connection), i18n, resolver, connection, getDriver(connection), false,
+                rewriteBatchedStatements);
     }
 
     public JdbcDatasource createDataSource(final JdbcConnection connection, boolean isAutoCommit,
             final boolean rewriteBatchedStatements) {
         final JdbcConfiguration.Driver driver = getDriver(connection);
-        return new JdbcDatasource(i18n, resolver, connection, driver, isAutoCommit, rewriteBatchedStatements);
+        return new JdbcDatasource(getPlatform(connection), i18n, resolver, connection, driver, isAutoCommit,
+                rewriteBatchedStatements);
     }
 
     public static class JdbcDatasource implements AutoCloseable {
 
         private final Resolver.ClassLoaderDescriptor classLoaderDescriptor;
 
+        private final Platform platform;
+
         private HikariDataSource dataSource;
 
-        public JdbcDatasource(final I18nMessage i18nMessage, final Resolver resolver, final JdbcConnection connection,
-                final JdbcConfiguration.Driver driver, final boolean isAutoCommit, final boolean rewriteBatchedStatements) {
+        private JdbcDatasource(final Platform platform, final I18nMessage i18nMessage, final Resolver resolver,
+                final JdbcConnection connection, final JdbcConfiguration.Driver driver, final boolean isAutoCommit,
+                final boolean rewriteBatchedStatements) {
+            this.platform = platform;
             final Thread thread = Thread.currentThread();
             final ClassLoader prev = thread.getContextClassLoader();
 
@@ -143,15 +176,17 @@ public class JdbcService {
                 if ("MSSQL_JTDS".equals(driver.getId())) {
                     dataSource.setConnectionTestQuery("SELECT 1");
                 }
+
+                // final Platform platform = plat.get(driver, i18nMessage);
                 dataSource.setUsername(connection.getUserId());
                 dataSource.setPassword(connection.getPassword());
                 dataSource.setDriverClassName(driver.getClassName());
-                dataSource.setJdbcUrl(connection.getJdbcUrl());
+                dataSource.setJdbcUrl(platform.buildUrl(connection.getJdbcUrl()));
                 dataSource.setAutoCommit(isAutoCommit);
                 dataSource.setMaximumPoolSize(1);
                 dataSource.setConnectionTimeout(connection.getConnectionTimeOut() * 1000);
                 dataSource.setValidationTimeout(connection.getConnectionValidationTimeOut() * 1000);
-                PlatformFactory.get(connection, i18nMessage).addDataSourceProperties(dataSource);
+                platform.addDataSourceProperties(dataSource);
                 dataSource.addDataSourceProperty("rewriteBatchedStatements", String.valueOf(rewriteBatchedStatements));
                 // dataSource.addDataSourceProperty("cachePrepStmts", "true");
                 // dataSource.addDataSourceProperty("prepStmtCacheSize", "250");

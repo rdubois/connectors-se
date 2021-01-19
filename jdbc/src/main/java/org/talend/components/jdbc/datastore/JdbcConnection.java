@@ -12,36 +12,50 @@
  */
 package org.talend.components.jdbc.datastore;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.talend.components.jdbc.configuration.JdbcConfiguration;
+import org.talend.components.jdbc.migration.ConnectionMigrationHandler;
 import org.talend.components.jdbc.service.UIActionService;
+import org.talend.sdk.component.api.component.Version;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.configuration.action.Checkable;
 import org.talend.sdk.component.api.configuration.action.Proposable;
 import org.talend.sdk.component.api.configuration.action.Suggestable;
+import org.talend.sdk.component.api.configuration.action.Updatable;
 import org.talend.sdk.component.api.configuration.condition.ActiveIf;
 import org.talend.sdk.component.api.configuration.constraint.Min;
 import org.talend.sdk.component.api.configuration.constraint.Required;
 import org.talend.sdk.component.api.configuration.type.DataStore;
+import org.talend.sdk.component.api.configuration.ui.DefaultValue;
 import org.talend.sdk.component.api.configuration.ui.layout.GridLayout;
 import org.talend.sdk.component.api.configuration.ui.widget.Credential;
 import org.talend.sdk.component.api.meta.Documentation;
 
 import java.io.Serializable;
+import java.util.List;
 
+import static java.util.Optional.ofNullable;
+import static org.talend.components.jdbc.service.UIActionService.ACTION_DEFAULT_VALUES;
 import static org.talend.components.jdbc.service.UIActionService.ACTION_LIST_HANDLERS_DB;
 import static org.talend.components.jdbc.service.UIActionService.ACTION_LIST_SUPPORTED_DB;
 
+@Version(value = JdbcConnection.VERSION, migrationHandler = ConnectionMigrationHandler.class)
 @Data
 @ToString(exclude = { "password" })
 @GridLayout({ @GridLayout.Row({ "dbType", "handler" }), @GridLayout.Row("jdbcUrl"), @GridLayout.Row("userId"),
         @GridLayout.Row("password") })
-@GridLayout(names = GridLayout.FormType.ADVANCED, value = { @GridLayout.Row("connectionTimeOut"),
+@GridLayout(names = GridLayout.FormType.ADVANCED, value = { @GridLayout.Row("jdbcUrl"), @GridLayout.Row("connectionTimeOut"),
         @GridLayout.Row("connectionValidationTimeOut") })
 @DataStore("JdbcConnection")
 @Checkable(UIActionService.ACTION_BASIC_HEALTH_CHECK)
 @Documentation("A connection to a data base")
 public class JdbcConnection implements Serializable {
+
+    public final static int VERSION = 3;
 
     @Option
     @Required
@@ -56,9 +70,9 @@ public class JdbcConnection implements Serializable {
     private String handler;
 
     @Option
-    @Required
-    @Documentation("jdbc connection url")
-    private String jdbcUrl;
+    @Documentation("Exploded jdbc url")
+    @Updatable(value = ACTION_DEFAULT_VALUES, parameters = { "../../connection" }, after = "setRawUrl")
+    private JDBCUrl jdbcUrl;
 
     @Option
     @Required
@@ -80,5 +94,64 @@ public class JdbcConnection implements Serializable {
     @Option
     @Documentation("Sets the maximum number of seconds that the pool will wait for a connection to be validated as alive.")
     private long connectionValidationTimeOut = 10;
+
+    public void setRawUrl(final String rawUrl) {
+        final JDBCUrl jdbcUrl = new JDBCUrl();
+        jdbcUrl.setSetRawUrl(true);
+        jdbcUrl.setRawUrl(rawUrl);
+        this.setJdbcUrl(jdbcUrl);
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder(toBuilder = true)
+    @GridLayout({ @GridLayout.Row("setRawUrl"), @GridLayout.Row("rawUrl"), @GridLayout.Row("host"), @GridLayout.Row("port"),
+            @GridLayout.Row("database"), @GridLayout.Row("parameters") })
+    @GridLayout(names = GridLayout.FormType.ADVANCED, value = { @GridLayout.Row({ "defineProtocol", "protocol" }) })
+    @Documentation("JDBC URL configuration")
+    public static class JDBCUrl implements Serializable {
+
+        @Option
+        @Documentation("Let user define complete jdbc url or not")
+        @DefaultValue("false")
+        private Boolean setRawUrl = false;
+
+        @Option
+        @ActiveIf(target = "setRawUrl", value = { "true" })
+        @Required
+        @Documentation("jdbc connection raw url")
+        private String rawUrl;
+
+        @Option
+        @ActiveIf(target = "setRawUrl", value = { "false" })
+        @Documentation("jdbc host")
+        private String host;
+
+        @Option
+        @ActiveIf(target = "setRawUrl", value = { "false" })
+        @Documentation("jdbc port")
+        private int port;
+
+        @Option
+        @ActiveIf(target = "setRawUrl", value = { "false" })
+        @Documentation("jdbc database")
+        private String database;
+
+        @Option
+        @ActiveIf(target = "setRawUrl", value = { "false" })
+        @Documentation("jdbc parameters")
+        private List<JdbcConfiguration.KeyVal> parameters;
+
+        @Option
+        @Documentation("Let user define protocol of the jdbc url.")
+        @DefaultValue("false")
+        private Boolean defineProtocol = false;
+
+        @Option
+        @ActiveIf(target = "defineProtocol", value = { "true" })
+        @Documentation("Protocol")
+        private String protocol;
+    }
 
 }

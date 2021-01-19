@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.talend.components.jdbc.configuration.JdbcConfiguration;
 import org.talend.components.jdbc.service.I18nMessage;
 
 import com.zaxxer.hikari.HikariDataSource;
@@ -33,8 +34,8 @@ public class MSSQLPlatform extends Platform {
 
     public static final String MSSQL_JTDS = "mssql_jtds";
 
-    public MSSQLPlatform(final I18nMessage i18n) {
-        super(i18n);
+    public MSSQLPlatform(final I18nMessage i18n, final JdbcConfiguration.Driver driver) {
+        super(i18n, driver);
     }
 
     @Override

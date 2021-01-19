@@ -15,6 +15,8 @@ package org.talend.components.jdbc.dataset;
 import lombok.Data;
 import lombok.experimental.Delegate;
 import org.talend.components.jdbc.datastore.JdbcConnection;
+import org.talend.components.jdbc.output.platforms.Platform;
+import org.talend.sdk.component.api.component.Version;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.configuration.action.Validable;
 import org.talend.sdk.component.api.configuration.type.DataSet;
@@ -25,6 +27,7 @@ import org.talend.sdk.component.api.meta.Documentation;
 import static org.talend.components.jdbc.service.UIActionService.ACTION_VALIDATION_READONLY_QUERY;
 import static org.talend.sdk.component.api.configuration.ui.layout.GridLayout.FormType.ADVANCED;
 
+@Version(JdbcConnection.VERSION)
 @Data
 @DataSet("SqlQueryDataset")
 @GridLayout({ @GridLayout.Row("connection"), @GridLayout.Row("sqlQuery") })
@@ -48,7 +51,7 @@ public class SqlQueryDataset implements BaseDataSet {
     private AdvancedCommon advancedCommon = new AdvancedCommon();
 
     @Override
-    public String getQuery() {
+    public String getQuery(final Platform platform) {
         return sqlQuery;
     }
 }

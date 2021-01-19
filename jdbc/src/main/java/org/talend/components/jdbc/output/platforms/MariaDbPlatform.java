@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.talend.components.jdbc.configuration.JdbcConfiguration;
 import org.talend.components.jdbc.service.I18nMessage;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +27,8 @@ public class MariaDbPlatform extends Platform {
 
     public static final String MARIADB = "mariadb";
 
-    public MariaDbPlatform(final I18nMessage i18n) {
-        super(i18n);
+    public MariaDbPlatform(final I18nMessage i18n, final JdbcConfiguration.Driver driver) {
+        super(i18n, driver);
     }
 
     @Override

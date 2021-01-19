@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.talend.components.jdbc.configuration.DistributionStrategy;
+import org.talend.components.jdbc.configuration.JdbcConfiguration;
 import org.talend.components.jdbc.configuration.RedshiftSortStrategy;
 import org.talend.components.jdbc.service.I18nMessage;
 
@@ -34,8 +35,8 @@ public class RedshiftPlatform extends Platform {
 
     public static final String REDSHIFT = "redshift";
 
-    public RedshiftPlatform(final I18nMessage i18n) {
-        super(i18n);
+    public RedshiftPlatform(final I18nMessage i18n, final JdbcConfiguration.Driver driver) {
+        super(i18n, driver);
     }
 
     @Override

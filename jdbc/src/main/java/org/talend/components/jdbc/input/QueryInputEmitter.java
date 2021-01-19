@@ -14,6 +14,7 @@ package org.talend.components.jdbc.input;
 
 import lombok.extern.slf4j.Slf4j;
 import org.talend.components.jdbc.configuration.InputQueryConfig;
+import org.talend.components.jdbc.datastore.JdbcConnection;
 import org.talend.components.jdbc.service.I18nMessage;
 import org.talend.components.jdbc.service.JdbcService;
 import org.talend.sdk.component.api.component.Icon;
@@ -26,7 +27,7 @@ import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
 import java.io.Serializable;
 
 @Slf4j
-@Version
+@Version(JdbcConnection.VERSION)
 @Icon(value = Icon.IconType.DATASTORE)
 @Emitter(name = "QueryInput")
 @Documentation("JDBC query input")

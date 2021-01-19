@@ -29,6 +29,7 @@ import org.talend.sdk.component.api.service.completion.Values;
 import org.talend.sdk.component.api.service.configuration.Configuration;
 import org.talend.sdk.component.api.service.healthcheck.HealthCheck;
 import org.talend.sdk.component.api.service.healthcheck.HealthCheckStatus;
+import org.talend.sdk.component.api.service.update.Update;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -56,6 +57,8 @@ import static java.util.stream.Collectors.toSet;
 @Service
 public class UIActionService {
 
+    public static final String ACTION_DEFAULT_VALUES = "ACTION_DEFAULT_VALUES";
+
     public static final String ACTION_LIST_SUPPORTED_DB = "ACTION_LIST_SUPPORTED_DB";
 
     public static final String ACTION_LIST_HANDLERS_DB = "ACTION_LIST_HANDLERS_DB";
@@ -80,6 +83,52 @@ public class UIActionService {
 
     @Configuration("jdbc")
     private Supplier<JdbcConfiguration> jdbcConfiguration;
+
+    /*
+     * public JdbcConfiguration.Driver getConfiguration(final String dbType, final String handler) {
+     * JdbcConfiguration.Driver driver = jdbcConfiguration.get().getDrivers().stream().filter(d -> d.getId().equals(dbType))
+     * .findFirst().orElse(null);
+     * 
+     * if (driver.getHandlers().contains(handler)) {
+     * driver = jdbcConfiguration.get().getDrivers().stream().filter(d -> d.getId().equals(handler)).findFirst()
+     * .orElse(null);
+     * }
+     * 
+     * return driver;
+     * }
+     */
+
+    @Update(ACTION_DEFAULT_VALUES)
+    public JdbcConnection.JDBCUrl setDefaultURLValues(final JdbcConnection connection) {
+        final JdbcConnection.JDBCUrl newConf = connection.getJdbcUrl().toBuilder().build();
+
+        final JdbcConfiguration.Driver configuration = jdbcService.getDriver(connection); // this.getConfiguration(dbType,
+                                                                                          // handler);
+
+        if (configuration == null) {
+            return newConf;
+        }
+
+        final Boolean setRawUrl = connection.getJdbcUrl().getSetRawUrl();
+        newConf.setSetRawUrl(setRawUrl);
+
+        if (setRawUrl) {
+            // final Platform platform = PlatformFactory.get(configuration, null);
+            final JdbcConnection.JDBCUrl copy = newConf.toBuilder().setRawUrl(false)
+                    .database(configuration.getDefaults().getDatabase()).host(configuration.getDefaults().getHost())
+                    .port(configuration.getDefaults().getPort()).parameters(configuration.getDefaults().getParameters()).build();
+
+            final String rawUrl = jdbcService.getPlatform(connection).buildUrl(copy);
+            newConf.setRawUrl(rawUrl);
+        } else {
+            newConf.setDatabase(configuration.getDefaults().getDatabase());
+            newConf.setHost(configuration.getDefaults().getHost());
+            newConf.setPort(configuration.getDefaults().getPort());
+            newConf.setParameters(configuration.getDefaults().getParameters());
+        }
+
+        return newConf;
+    }
 
     @DynamicValues(ACTION_LIST_SUPPORTED_DB)
     public Values loadSupportedDataBaseTypes() {
@@ -139,7 +188,8 @@ public class UIActionService {
                 Connection conn = dataSource.getConnection();
                 final Statement statement = conn.createStatement()) {
             statement.setMaxRows(1);
-            try (final ResultSet result = statement.executeQuery(dataset.getQuery())) {
+            try (final ResultSet result = statement
+                    .executeQuery(dataset.getQuery(jdbcService.getPlatform(dataset.getConnection())))) {
                 return new SuggestionValues(true, IntStream.rangeClosed(1, result.getMetaData().getColumnCount()).mapToObj(i -> {
                     try {
                         return result.getMetaData().getColumnName(i);

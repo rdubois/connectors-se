@@ -13,8 +13,8 @@
 package org.talend.components.jdbc.input;
 
 import lombok.extern.slf4j.Slf4j;
-import org.talend.components.jdbc.ErrorFactory;
 import org.talend.components.jdbc.configuration.InputConfig;
+import org.talend.components.jdbc.output.platforms.Platform;
 import org.talend.components.jdbc.service.I18nMessage;
 import org.talend.components.jdbc.service.JdbcService;
 import org.talend.sdk.component.api.input.Producer;
@@ -51,6 +51,8 @@ public abstract class AbstractInputEmitter implements Serializable {
 
     private final InputConfig inputConfig;
 
+    private transient Platform platform;
+
     private RecordBuilderFactory recordBuilderFactory;
 
     private final JdbcService jdbcDriversService;
@@ -77,10 +79,12 @@ public abstract class AbstractInputEmitter implements Serializable {
 
     @PostConstruct
     public void init() {
-        if (inputConfig.getDataSet().getQuery() == null || inputConfig.getDataSet().getQuery().trim().isEmpty()) {
+        platform = jdbcDriversService.getPlatform(inputConfig.getDataSet().getConnection());
+
+        if (inputConfig.getDataSet().getQuery(platform) == null || inputConfig.getDataSet().getQuery(platform).trim().isEmpty()) {
             throw new IllegalArgumentException(i18n.errorEmptyQuery());
         }
-        if (jdbcDriversService.isNotReadOnlySQLQuery(inputConfig.getDataSet().getQuery())) {
+        if (jdbcDriversService.isNotReadOnlySQLQuery(inputConfig.getDataSet().getQuery(platform))) {
             throw new IllegalArgumentException(i18n.errorUnauthorizedQuery());
         }
 
@@ -89,7 +93,7 @@ public abstract class AbstractInputEmitter implements Serializable {
             connection = dataSource.getConnection();
             statement = connection.createStatement();
             statement.setFetchSize(inputConfig.getDataSet().getFetchSize());
-            resultSet = statement.executeQuery(inputConfig.getDataSet().getQuery());
+            resultSet = statement.executeQuery(inputConfig.getDataSet().getQuery(platform));
         } catch (final SQLException e) {
             throw toIllegalStateException(e);
         }

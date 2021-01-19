@@ -13,6 +13,7 @@
 package org.talend.components.jdbc.input;
 
 import org.talend.components.jdbc.configuration.InputCaptureDataChangeConfig;
+import org.talend.components.jdbc.datastore.JdbcConnection;
 import org.talend.components.jdbc.service.I18nMessage;
 import org.talend.components.jdbc.service.JdbcService;
 import org.talend.sdk.component.api.component.Icon;
@@ -26,7 +27,7 @@ import java.io.Serializable;
 import java.util.List;
 import static java.util.Collections.singletonList;
 
-@Version
+@Version(JdbcConnection.VERSION)
 @Icon(value = Icon.IconType.DATASTORE)
 @Documentation("JDBC input using stream table name")
 @PartitionMapper(name = "StreamTableNameInput", infinite = true)

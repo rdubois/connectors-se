@@ -34,7 +34,7 @@ class JdbcDriverLoadingTest {
         connection.setUserId("sa");
         connection.setPassword("sa");
         connection.setDbType("ORACLEXX");
-        connection.setJdbcUrl("jdbc:DDL://localhost:1234/foo");
+        connection.setRawUrl("jdbc:DDL://localhost:1234/foo");
         final SqlQueryDataset dataset = new SqlQueryDataset();
         dataset.setConnection(connection);
         dataset.setSqlQuery("select * from users");
@@ -53,7 +53,7 @@ class JdbcDriverLoadingTest {
         connection.setUserId("sa");
         connection.setPassword("sa");
         connection.setDbType("ORACLE");
-        connection.setJdbcUrl("jdbc:DDL://localhost:1234/foo");
+        connection.setRawUrl("jdbc:DDL://localhost:1234/foo");
         final SqlQueryDataset dataset = new SqlQueryDataset();
         dataset.setConnection(connection);
         dataset.setSqlQuery("select * from users");

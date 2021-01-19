@@ -75,6 +75,14 @@ public class JdbcConfiguration implements Serializable {
         @Documentation("Fixed jdbc url parameters")
         private List<KeyVal> fixedParameters = new ArrayList<>();
 
+        @Option
+        @Documentation("JDBC default protocol")
+        private String protocol;
+
+        @Option
+        @Documentation("Defaults values")
+        private Defaults defaults;
+
         public String getDisplayName() {
             return ofNullable(displayName).filter(d -> !d.isEmpty()).orElse(id);
         }
@@ -94,4 +102,25 @@ public class JdbcConfiguration implements Serializable {
         private String value;
     }
 
+    @Data
+    @NoArgsConstructor
+    @Documentation("Default Values for connection")
+    public static class Defaults {
+
+        @Option
+        @Documentation("JDBC default host")
+        private String host;
+
+        @Option
+        @Documentation("JDBC default port")
+        private int port;
+
+        @Option
+        @Documentation("JDBC default database")
+        private String database;
+
+        @Option
+        @Documentation("JDBC default parameters")
+        private List<JdbcConfiguration.KeyVal> parameters = new ArrayList<>();
+    }
 }

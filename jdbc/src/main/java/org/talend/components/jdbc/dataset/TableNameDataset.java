@@ -15,6 +15,8 @@ package org.talend.components.jdbc.dataset;
 import lombok.Data;
 import lombok.experimental.Delegate;
 import org.talend.components.jdbc.datastore.JdbcConnection;
+import org.talend.components.jdbc.output.platforms.Platform;
+import org.talend.sdk.component.api.component.Version;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.configuration.action.Suggestable;
 import org.talend.sdk.component.api.configuration.constraint.Required;
@@ -22,10 +24,10 @@ import org.talend.sdk.component.api.configuration.type.DataSet;
 import org.talend.sdk.component.api.configuration.ui.layout.GridLayout;
 import org.talend.sdk.component.api.meta.Documentation;
 
-import static org.talend.components.jdbc.output.platforms.PlatformFactory.get;
 import static org.talend.components.jdbc.service.UIActionService.ACTION_SUGGESTION_TABLE_NAMES;
 import static org.talend.sdk.component.api.configuration.ui.layout.GridLayout.FormType.ADVANCED;
 
+@Version(JdbcConnection.VERSION)
 @Data
 @DataSet("TableNameDataset")
 @GridLayout({ @GridLayout.Row("connection"), @GridLayout.Row("tableName") })
@@ -49,8 +51,8 @@ public class TableNameDataset implements BaseDataSet {
     private AdvancedCommon advancedCommon = new AdvancedCommon();
 
     @Override
-    public String getQuery() {
+    public String getQuery(final Platform platform) {
         // No need for the i18n service for this instance
-        return "select * from " + get(connection, null).identifier(getTableName());
+        return "select * from " + platform.identifier(getTableName());
     }
 }

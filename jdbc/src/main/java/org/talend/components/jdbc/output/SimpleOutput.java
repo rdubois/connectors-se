@@ -15,8 +15,8 @@ package org.talend.components.jdbc.output;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.talend.components.jdbc.configuration.OutputConfig;
+import org.talend.components.jdbc.datastore.JdbcConnection;
 import org.talend.components.jdbc.output.platforms.Platform;
-import org.talend.components.jdbc.output.platforms.PlatformFactory;
 import org.talend.components.jdbc.output.statement.QueryManagerFactory;
 import org.talend.components.jdbc.output.statement.operations.QueryManagerImpl;
 import org.talend.components.jdbc.service.I18nMessage;
@@ -34,7 +34,7 @@ import java.util.Map;
 
 @Slf4j
 @Getter
-@Version(value = 2, migrationHandler = SimpleOutput.Migration.class)
+@Version(value = JdbcConnection.VERSION, migrationHandler = SimpleOutput.Migration.class)
 @Processor(name = "Output")
 @Icon(value = Icon.IconType.DATASTORE)
 @Documentation("JDBC Output component")
@@ -47,7 +47,7 @@ public class SimpleOutput extends Output implements Serializable {
     public SimpleOutput(@Option("configuration") final OutputConfig configuration, final JdbcService jdbcService,
             final I18nMessage i18n) {
         super(configuration, jdbcService, i18n);
-        this.platform = PlatformFactory.get(configuration.getDataset().getConnection(), i18n);
+        this.platform = jdbcService.getPlatform(configuration.getDataset().getConnection());
         this.queryManager = QueryManagerFactory.getQueryManager(platform, i18n, configuration);
     }
 

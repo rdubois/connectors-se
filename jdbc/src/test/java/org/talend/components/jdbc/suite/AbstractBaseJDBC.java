@@ -22,7 +22,6 @@ import org.talend.components.jdbc.containers.JdbcTestContainer;
 import org.talend.components.jdbc.dataset.SqlQueryDataset;
 import org.talend.components.jdbc.dataset.TableNameDataset;
 import org.talend.components.jdbc.datastore.JdbcConnection;
-import org.talend.components.jdbc.output.platforms.PlatformFactory;
 import org.talend.components.jdbc.service.I18nMessage;
 import org.talend.components.jdbc.service.JdbcService;
 import org.talend.components.jdbc.service.UIActionService;
@@ -83,7 +82,7 @@ public abstract class AbstractBaseJDBC {
         connection.setUserId(container.getUsername());
         connection.setPassword(container.getPassword());
         connection.setDbType(container.getDatabaseType());
-        connection.setJdbcUrl(container.getJdbcUrl());
+        connection.setRawUrl(container.getJdbcUrl());
         return connection;
     }
 
@@ -93,7 +92,7 @@ public abstract class AbstractBaseJDBC {
         dataset.setConnection(connection);
         final String total = "total";
         dataset.setSqlQuery(
-                "select count(*) as " + total + " from " + PlatformFactory.get(connection, i18nMessage).identifier(table));
+                "select count(*) as " + total + " from " + getJdbcService().getPlatform(connection).identifier(table));
         final InputQueryConfig config = new InputQueryConfig();
         config.setDataSet(dataset);
         final String inConfig = configurationByExample().forInstance(config).configured().toQueryString();
