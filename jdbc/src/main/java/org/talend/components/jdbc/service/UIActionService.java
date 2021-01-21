@@ -102,8 +102,7 @@ public class UIActionService {
     public JdbcConnection.JDBCUrl setDefaultURLValues(final JdbcConnection connection) {
         final JdbcConnection.JDBCUrl newConf = connection.getJdbcUrl().toBuilder().build();
 
-        final JdbcConfiguration.Driver configuration = jdbcService.getDriver(connection); // this.getConfiguration(dbType,
-                                                                                          // handler);
+        final JdbcConfiguration.Driver configuration = jdbcService.getDriver(connection);
 
         if (configuration == null) {
             return newConf;
@@ -112,19 +111,22 @@ public class UIActionService {
         final Boolean setRawUrl = connection.getJdbcUrl().getSetRawUrl();
         newConf.setSetRawUrl(setRawUrl);
 
-        if (setRawUrl) {
-            // final Platform platform = PlatformFactory.get(configuration, null);
-            final JdbcConnection.JDBCUrl copy = newConf.toBuilder().setRawUrl(false)
-                    .database(configuration.getDefaults().getDatabase()).host(configuration.getDefaults().getHost())
-                    .port(configuration.getDefaults().getPort()).parameters(configuration.getDefaults().getParameters()).build();
+        if (configuration.getDefaults() != null) {
+            if (setRawUrl) {
+                // final Platform platform = PlatformFactory.get(configuration, null);
+                final JdbcConnection.JDBCUrl copy = newConf.toBuilder().setRawUrl(false)
+                        .database(configuration.getDefaults().getDatabase()).host(configuration.getDefaults().getHost())
+                        .port(configuration.getDefaults().getPort()).parameters(configuration.getDefaults().getParameters())
+                        .build();
 
-            final String rawUrl = jdbcService.getPlatform(connection).buildUrl(copy);
-            newConf.setRawUrl(rawUrl);
-        } else {
-            newConf.setDatabase(configuration.getDefaults().getDatabase());
-            newConf.setHost(configuration.getDefaults().getHost());
-            newConf.setPort(configuration.getDefaults().getPort());
-            newConf.setParameters(configuration.getDefaults().getParameters());
+                final String rawUrl = jdbcService.getPlatform(connection).buildUrl(copy);
+                newConf.setRawUrl(rawUrl);
+            } else {
+                newConf.setDatabase(configuration.getDefaults().getDatabase());
+                newConf.setHost(configuration.getDefaults().getHost());
+                newConf.setPort(configuration.getDefaults().getPort());
+                newConf.setParameters(configuration.getDefaults().getParameters());
+            }
         }
 
         return newConf;

@@ -84,7 +84,7 @@ public class JdbcService {
 
     private JdbcConfiguration.Driver getDriver(final String dbType, final String handler) {
         JdbcConfiguration.Driver driver = jdbcConfiguration.get().getDrivers().stream().filter(this::driverNotDisabled)
-                .filter(d -> d.getId().equals(dbType)).findFirst()
+                .filter(d -> d.getId().toLowerCase(Locale.ROOT).equals(dbType.toLowerCase(Locale.ROOT))).findFirst()
                 .orElseThrow(() -> new IllegalStateException(i18n.errorDriverNotFound(dbType)));
 
         // We can get a configuration with a previous selected handler which is not related to selected driver

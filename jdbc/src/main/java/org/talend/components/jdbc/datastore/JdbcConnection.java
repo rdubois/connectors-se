@@ -71,7 +71,7 @@ public class JdbcConnection implements Serializable {
 
     @Option
     @Documentation("Exploded jdbc url")
-    @Updatable(value = ACTION_DEFAULT_VALUES, parameters = { "../../connection" }, after = "setRawUrl")
+    @Updatable(value = ACTION_DEFAULT_VALUES, parameters = { ".." }, after = "setRawUrl")
     private JDBCUrl jdbcUrl;
 
     @Option
@@ -119,7 +119,6 @@ public class JdbcConnection implements Serializable {
 
         @Option
         @ActiveIf(target = "setRawUrl", value = { "true" })
-        @Required
         @Documentation("jdbc connection raw url")
         private String rawUrl;
 
