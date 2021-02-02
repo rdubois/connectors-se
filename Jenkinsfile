@@ -10,8 +10,8 @@ def gitCredentials = usernamePassword(
     passwordVariable: 'GITHUB_TOKEN')
 def dockerCredentials = usernamePassword(
 	credentialsId: 'docker-registry-credentials',
-    passwordVariable: 'DOCKER_PASSWORD',
-    usernameVariable: 'DOCKER_LOGIN')
+    passwordVariable: 'ARTIFACTORY_PASSWORD',
+    usernameVariable: 'ARTIFACTORY_LOGIN')
 def sonarCredentials = usernamePassword(
     credentialsId: 'sonar-credentials',
     passwordVariable: 'SONAR_PASSWORD', 
@@ -70,6 +70,8 @@ spec:
         VERACODE_APP_NAME = 'Talend Component Kit'
         VERACODE_SANDBOX = 'connectors-se'
         APP_ID = '579232'
+        ARTIFACTORY_REGISTRY = "artifactory.datapwn.com"
+        TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX="artifactory.datapwn.com/docker-io-remote/"
     }
 
     options {
@@ -90,6 +92,18 @@ spec:
     }
 
     stages {
+        stage('Docker login') {
+            steps {
+                container('main') {
+                    withCredentials([dockerCredentials]) {
+                        sh '''#!/bin/bash
+                        docker version
+                        echo $ARTIFACTORY_PASSWORD | docker login $ARTIFACTORY_REGISTRY -u $ARTIFACTORY_LOGIN --password-stdin
+                        '''
+                    }
+                }
+            }
+        }
         stage('Run maven') {
             when {
                 expression { params.Action == 'STANDARD' }

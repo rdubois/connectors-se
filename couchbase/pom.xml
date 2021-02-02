@@ -13,7 +13,6 @@
   <name>Components :: Couchbase</name>
 
   <properties>
-    <testcontainers.version>1.12.1</testcontainers.version>
     <couchbase.client.version>2.7.9</couchbase.client.version>
   </properties>
 
@@ -32,6 +31,11 @@
       <groupId>org.testcontainers</groupId>
       <artifactId>couchbase</artifactId>
       <version>${testcontainers.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

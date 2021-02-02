@@ -12,18 +12,20 @@
  */
 package org.talend.components.couchbase;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.couchbase.client.java.CouchbaseCluster;
-import com.couchbase.client.java.bucket.BucketType;
-import com.couchbase.client.java.cluster.DefaultBucketSettings;
+import com.couchbase.client.java.env.CouchbaseEnvironment;
+import com.couchbase.client.java.env.DefaultCouchbaseEnvironment;
+
 import org.talend.components.couchbase.datastore.CouchbaseDataStore;
 import org.talend.sdk.component.api.service.Service;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
 import org.talend.sdk.component.junit.BaseComponentsHandler;
 import org.talend.sdk.component.junit5.Injected;
+import org.testcontainers.couchbase.BucketDefinition;
 import org.testcontainers.couchbase.CouchbaseContainer;
-
-import java.util.Arrays;
-import java.util.List;
 
 public abstract class CouchbaseUtilTest {
 
@@ -43,7 +45,7 @@ public abstract class CouchbaseUtilTest {
 
     private static final CouchbaseContainer COUCHBASE_CONTAINER;
 
-    protected final CouchbaseCluster couchbaseCluster;
+    protected static final CouchbaseCluster COUCHBASE_CLUSTER;
 
     protected final CouchbaseDataStore couchbaseDataStore;
 
@@ -54,11 +56,15 @@ public abstract class CouchbaseUtilTest {
     protected RecordBuilderFactory recordBuilderFactory;
 
     static {
-        COUCHBASE_CONTAINER = new CouchbaseContainer().withClusterAdmin(CLUSTER_USERNAME, CLUSTER_PASSWORD)
-                .withNewBucket(DefaultBucketSettings.builder().enableFlush(true).name(BUCKET_NAME).password(BUCKET_PASSWORD)
-                        .quota(BUCKET_QUOTA).type(BucketType.COUCHBASE).build());
+        COUCHBASE_CONTAINER = new CouchbaseContainer("couchbase/server:6.5.1").withCredentials(CLUSTER_USERNAME, CLUSTER_PASSWORD)
+                .withBucket(new BucketDefinition(BUCKET_NAME).withQuota(BUCKET_QUOTA));
         COUCHBASE_CONTAINER.setPortBindings(ports);
         COUCHBASE_CONTAINER.start();
+        CouchbaseEnvironment environment = DefaultCouchbaseEnvironment.builder().connectTimeout(DEFAULT_TIMEOUT_IN_SEC)
+                .bootstrapCarrierDirectPort(COUCHBASE_CONTAINER.getBootstrapCarrierDirectPort())
+                .bootstrapHttpDirectPort(COUCHBASE_CONTAINER.getBootstrapHttpDirectPort()).build();
+
+        COUCHBASE_CLUSTER = CouchbaseCluster.create(environment, COUCHBASE_CONTAINER.getHost());
     }
 
     public CouchbaseUtilTest() {
@@ -67,8 +73,6 @@ public abstract class CouchbaseUtilTest {
         couchbaseDataStore.setUsername(CLUSTER_USERNAME);
         couchbaseDataStore.setPassword(CLUSTER_PASSWORD);
         couchbaseDataStore.setConnectTimeout(DEFAULT_TIMEOUT_IN_SEC);
-
-        couchbaseCluster = COUCHBASE_CONTAINER.getCouchbaseCluster();
     }
 
     protected String generateDocId(String prefix, int number) {

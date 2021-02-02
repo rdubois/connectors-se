@@ -32,7 +32,7 @@
     </license>
   </licenses>
 
-    <modules>
+  <modules>
         <module>jdbc</module>
         <module>salesforce</module>
         <module>mongodb</module>
@@ -115,6 +115,8 @@
     <compress.version>1.19</compress.version>
     <commons-codec.version>1.14</commons-codec.version>
     <mockito.version>1.10.19</mockito.version>
+    <testcontainers.version>1.15.1</testcontainers.version>
+    <jna.version>5.5.0</jna.version>
 
     <jersey.version>2.22.2</jersey.version>
 
@@ -263,6 +265,28 @@
         <artifactId>connectors-test-bom</artifactId>
         <version>${connectors-test-bom.version}</version>
         <type>pom</type>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers</artifactId>
+        <version>${testcontainers.version}</version>
+        <scope>test</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>net.java.dev.jna</groupId>
+        <artifactId>jna</artifactId>
+        <version>${jna.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -745,6 +769,9 @@
             </talend.component.junit.maven.repositories>
           </systemPropertyVariables>
           <argLine>@{argLine} -Dfile.encoding=UTF-8</argLine>
+          <environmentVariables>
+            <TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX>artifactory.datapwn.com/docker-io-remote/</TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX>
+          </environmentVariables>
         </configuration>
       </plugin>
       <plugin>
@@ -853,6 +880,17 @@
             <version>${spotbugs.version}</version>
           </dependency>
         </dependencies>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>${surefire.version}</version>
+        <configuration>
+          <argLine>${failSafeArgLine}</argLine>
+          <environmentVariables>
+            <TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX>artifactory.datapwn.com/docker-io-remote/</TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX>
+          </environmentVariables>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -1147,6 +1185,32 @@
         <validation.wording>true</validation.wording>
         <validation.metadata>true</validation.metadata>
       </properties>
+    </profile>
+    <profile>
+      <!-- use this profile for local runs when you cannot have access to artifactory -->
+      <id>no-artifactory</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <environmentVariables>
+                <TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX>docker.io/</TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX>
+              </environmentVariables>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <environmentVariables>
+                <TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX>docker.io/</TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX>
+              </environmentVariables>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 </project>

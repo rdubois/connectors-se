@@ -14,7 +14,6 @@
     <description>Google Big Query</description>
 
     <properties>
-        <testcontainers.version>1.12.3</testcontainers.version>
         <google.bq.sdk.version>1.117.1</google.bq.sdk.version>
         <google.gcs.sdk.version>1.113.1</google.gcs.sdk.version>
 
