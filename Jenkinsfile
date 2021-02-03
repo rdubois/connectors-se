@@ -9,7 +9,7 @@ def gitCredentials = usernamePassword(
     usernameVariable: 'GITHUB_LOGIN',
     passwordVariable: 'GITHUB_TOKEN')
 def dockerCredentials = usernamePassword(
-	credentialsId: 'docker-registry-credentials',
+	credentialsId: 'artifactory-datapwn-credentials',
     passwordVariable: 'ARTIFACTORY_PASSWORD',
     usernameVariable: 'ARTIFACTORY_LOGIN')
 def sonarCredentials = usernamePassword(
