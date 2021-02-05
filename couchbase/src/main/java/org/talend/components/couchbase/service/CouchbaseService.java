@@ -12,6 +12,23 @@
  */
 package org.talend.components.couchbase.service;
 
+import static org.talend.sdk.component.api.record.Schema.Type.ARRAY;
+import static org.talend.sdk.component.api.record.Schema.Type.BOOLEAN;
+import static org.talend.sdk.component.api.record.Schema.Type.DATETIME;
+import static org.talend.sdk.component.api.record.Schema.Type.DOUBLE;
+import static org.talend.sdk.component.api.record.Schema.Type.FLOAT;
+import static org.talend.sdk.component.api.record.Schema.Type.INT;
+import static org.talend.sdk.component.api.record.Schema.Type.LONG;
+import static org.talend.sdk.component.api.record.Schema.Type.RECORD;
+import static org.talend.sdk.component.api.record.Schema.Type.STRING;
+
+import java.util.Date;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.couchbase.client.core.CouchbaseException;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
@@ -21,8 +38,7 @@ import com.couchbase.client.java.document.json.JsonObject;
 import com.couchbase.client.java.env.CouchbaseEnvironment;
 import com.couchbase.client.java.env.DefaultCouchbaseEnvironment;
 import com.couchbase.client.java.error.InvalidPasswordException;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.couchbase.dataset.CouchbaseDataSet;
@@ -39,14 +55,8 @@ import org.talend.sdk.component.api.service.healthcheck.HealthCheckStatus;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
 import org.talend.sdk.component.api.service.schema.DiscoverSchema;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.talend.sdk.component.api.record.Schema.Type.*;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 @Version(1)
 @Slf4j
@@ -81,7 +91,7 @@ public class CouchbaseService {
         try {
             ClusterHolder holder = clustersPool.computeIfAbsent(dataStore, ds -> {
                 CouchbaseEnvironment environment = new DefaultCouchbaseEnvironment.Builder().connectTimeout(connectTimeout)
-                        .build();
+                        .kvTimeout(connectTimeout).build();
                 Cluster cluster = CouchbaseCluster.create(environment, urls);
                 cluster.authenticate(username, password);
                 return new ClusterHolder(environment, cluster);
