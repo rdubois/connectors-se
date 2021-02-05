@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2020 Talend Inc. - www.talend.com
+ * Copyright (C) 2006-2021 Talend Inc. - www.talend.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,11 +12,6 @@
  */
 package org.talend.components.common.stream.input.rawtext;
 
-import org.talend.components.common.stream.api.input.RecordReader;
-import org.talend.components.common.stream.format.rawtext.ExtendedRawTextConfiguration;
-import org.talend.sdk.component.api.record.Record;
-import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +20,11 @@ import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import org.talend.components.common.stream.api.input.RecordReader;
+import org.talend.components.common.stream.format.rawtext.ExtendedRawTextConfiguration;
+import org.talend.sdk.component.api.record.Record;
+import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
 
 public class RawTextRecordReader implements RecordReader {
 

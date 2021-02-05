@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2020 Talend Inc. - www.talend.com
+ * Copyright (C) 2006-2021 Talend Inc. - www.talend.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -18,10 +18,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.talend.components.marketo.MarketoBaseTest;
+import org.talend.components.marketo.MarketoBaseTestIT;
 import org.talend.components.marketo.datastore.MarketoDataStore;
 import org.talend.sdk.component.api.DecryptedServer;
 import org.talend.sdk.component.api.service.Service;
 import org.talend.sdk.component.api.service.completion.SuggestionValues;
+import org.talend.sdk.component.junit.http.internal.impl.MarketoResponseLocator;
+import org.talend.sdk.component.junit.http.junit5.HttpApi;
 import org.talend.sdk.component.junit5.WithComponents;
 import org.talend.sdk.component.junit5.WithMavenServers;
 import org.talend.sdk.component.maven.Server;
@@ -32,26 +35,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @WithMavenServers
 @WithComponents("org.talend.components.marketo")
-public class UIActionServiceTestIT extends MarketoBaseTest {
-
-    @DecryptedServer(value = "marketo-prod-instance")
-    protected Server serverEndpoint;
-
-    @DecryptedServer(value = "marketo-prod")
-    protected Server serverCreds;
+public class UIActionServiceTestIT extends MarketoBaseTestIT {
 
     @Service
     protected UIActionService service;
-
-    protected MarketoDataStore dataStore;
-
-    @BeforeAll
-    void setup() {
-        dataStore = new MarketoDataStore();
-        dataStore.setEndpoint(serverEndpoint.getUsername());
-        dataStore.setClientId(serverCreds.getUsername());
-        dataStore.setClientSecret(serverCreds.getPassword());
-    }
 
     @Test
     void getListNamesExceedingBatchLimit() {

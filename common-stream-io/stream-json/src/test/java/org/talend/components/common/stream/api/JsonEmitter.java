@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2020 Talend Inc. - www.talend.com
+ * Copyright (C) 2006-2021 Talend Inc. - www.talend.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,8 +12,13 @@
  */
 package org.talend.components.common.stream.api;
 
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.util.Iterator;
+
+import javax.json.JsonReaderFactory;
+
 import org.talend.components.common.stream.api.input.RecordReader;
 import org.talend.components.common.stream.api.input.RecordReaderSupplier;
 import org.talend.components.common.stream.format.json.JsonConfiguration;
@@ -27,11 +32,8 @@ import org.talend.sdk.component.api.meta.Documentation;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
 
-import javax.json.JsonReaderFactory;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.util.Iterator;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Version(1)

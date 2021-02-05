@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2020 Talend Inc. - www.talend.com
+ * Copyright (C) 2006-2021 Talend Inc. - www.talend.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -19,13 +19,10 @@ import java.util.Iterator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.talend.components.common.stream.format.Encoding;
-import org.talend.components.common.stream.format.Encoding.Type;
 import org.talend.components.common.stream.format.excel.ExcelConfiguration;
 import org.talend.components.common.stream.format.excel.ExcelConfiguration.ExcelFormat;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.runtime.record.RecordBuilderFactoryImpl;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class HTMLReaderTest {
 

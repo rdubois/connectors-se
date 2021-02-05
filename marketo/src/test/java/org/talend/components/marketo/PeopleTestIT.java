@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2020 Talend Inc. - www.talend.com
+ * Copyright (C) 2006-2021 Talend Inc. - www.talend.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -19,6 +19,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.talend.components.marketo.dataset.MarketoOutputConfiguration.OutputAction;
 import org.talend.sdk.component.api.record.Record;
+import org.talend.sdk.component.junit.http.internal.impl.MarketoResponseLocator;
+import org.talend.sdk.component.junit.http.junit5.HttpApi;
 import org.talend.sdk.component.junit5.WithComponents;
 import org.talend.sdk.component.runtime.manager.chain.Job;
 
@@ -29,7 +31,8 @@ import static org.talend.sdk.component.junit.SimpleFactory.configurationByExampl
 
 @Slf4j
 @WithComponents("org.talend.components.marketo")
-public class PeopleTestIT extends org.talend.components.marketo.MarketoBaseTest {
+@HttpApi(useSsl = true)
+public class PeopleTestIT extends MarketoBaseTestIT {
 
     public static final String LIST_ID_COMPQA = "1011";
 

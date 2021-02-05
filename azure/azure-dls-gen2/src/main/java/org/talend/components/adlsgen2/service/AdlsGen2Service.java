@@ -289,10 +289,10 @@ public class AdlsGen2Service {
                 infos.setEtag(f.asJsonObject().getString("etag"));
                 infos.setContentLength(Integer.parseInt(f.asJsonObject().getString("contentLength")));
                 infos.setLastModified(f.asJsonObject().getString("lastModified"));
-                if (f.asJsonObject().entrySet().contains("owner")) {
+                if (f.asJsonObject().containsKey("owner")) {
                     infos.setOwner(f.asJsonObject().getString("owner"));
                 }
-                if (f.asJsonObject().entrySet().contains("permissions")) {
+                if (f.asJsonObject().containsKey("permissions")) {
                     infos.setPermissions(f.asJsonObject().getString("permissions"));
                 }
                 blobs.add(infos);
@@ -341,10 +341,10 @@ public class AdlsGen2Service {
                 infos.setEtag(f.asJsonObject().getString("etag"));
                 infos.setContentLength(Integer.parseInt(f.asJsonObject().getString("contentLength")));
                 infos.setLastModified(f.asJsonObject().getString("lastModified"));
-                if (f.asJsonObject().entrySet().contains("owner")) {
+                if (f.asJsonObject().containsKey("owner")) {
                     infos.setOwner(f.asJsonObject().getString("owner"));
                 }
-                if (f.asJsonObject().entrySet().contains("permissions")) {
+                if (f.asJsonObject().containsKey("permissions")) {
                     infos.setPermissions(f.asJsonObject().getString("permissions"));
                 }
             }
@@ -477,7 +477,7 @@ public class AdlsGen2Service {
      * length of the file after all data has been written, and there must not be a request entity body included with the
      * request.
      *
-     * @param configuration
+     * @param datasetRuntimeInfo
      * @param position
      * @return
      */

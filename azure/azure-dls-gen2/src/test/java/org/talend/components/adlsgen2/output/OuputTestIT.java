@@ -21,6 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.talend.components.adlsgen2.AdlsGen2IntegrationTestBase;
 import org.talend.components.adlsgen2.AdlsGen2TestBase;
 import org.talend.components.adlsgen2.common.format.FileFormat;
 import org.talend.components.adlsgen2.dataset.AdlsGen2DataSet;
@@ -46,7 +47,7 @@ import static org.talend.sdk.component.junit.SimpleFactory.configurationByExampl
 
 @Slf4j
 @WithComponents("org.talend.components.adlsgen2")
-public class OuputTestIT extends AdlsGen2TestBase {
+public class OuputTestIT extends AdlsGen2IntegrationTestBase {
 
     CSVFormatOptionsWithSchema csvConfig;
 

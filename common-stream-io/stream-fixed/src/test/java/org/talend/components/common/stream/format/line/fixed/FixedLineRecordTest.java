@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2020 Talend Inc. - www.talend.com
+ * Copyright (C) 2006-2021 Talend Inc. - www.talend.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -20,8 +20,8 @@ import org.junit.jupiter.api.Test;
 import org.talend.components.common.stream.api.input.RecordReader;
 import org.talend.components.common.stream.format.Encoding;
 import org.talend.components.common.stream.format.Encoding.Type;
-import org.talend.components.common.stream.format.fixed.FixedConfiguration;
 import org.talend.components.common.stream.format.LineConfiguration;
+import org.talend.components.common.stream.format.fixed.FixedConfiguration;
 import org.talend.components.common.stream.input.fixed.FixedReaderSupplier;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;

@@ -29,6 +29,8 @@ import org.apache.parquet.hadoop.util.HadoopInputFile;
 import org.apache.parquet.hadoop.util.HadoopOutputFile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.talend.components.adlsgen2.AdlsGen2TestBase;
 import org.talend.components.common.Constants;
 import org.talend.components.common.converters.ParquetConverter;
@@ -72,6 +74,7 @@ class ParquetConverterTest extends AdlsGen2TestBase {
     }
 
     @Test
+    @DisabledOnOs(OS.WINDOWS)
     void writeParquetFile() throws Exception {
         String tmp = tmpDir + "talend-adlsgen2-test-" + UUID.randomUUID() + ".parquet";
         HadoopOutputFile hdpOut = HadoopOutputFile.fromPath(new Path(tmp), new org.apache.hadoop.conf.Configuration());

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2020 Talend Inc. - www.talend.com
+ * Copyright (C) 2006-2021 Talend Inc. - www.talend.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -23,8 +23,8 @@ import org.apache.commons.csv.CSVRecord;
 import org.talend.components.common.stream.CSVHelper;
 import org.talend.components.common.stream.api.input.RecordReader;
 import org.talend.components.common.stream.api.input.RecordReaderSupplier;
-import org.talend.components.common.stream.format.csv.CSVConfiguration;
 import org.talend.components.common.stream.format.ContentFormat;
+import org.talend.components.common.stream.format.csv.CSVConfiguration;
 import org.talend.components.common.stream.input.line.DefaultRecordReader;
 import org.talend.components.common.stream.input.line.LineSplitter;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;

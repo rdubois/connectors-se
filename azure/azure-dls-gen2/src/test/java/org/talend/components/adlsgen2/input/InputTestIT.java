@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.talend.components.adlsgen2.AdlsGen2IntegrationTestBase;
 import org.talend.components.adlsgen2.AdlsGen2TestBase;
 import org.talend.components.adlsgen2.common.format.FileFormat;
 import org.talend.components.common.formats.AvroFormatOptions;
@@ -36,7 +37,7 @@ import static org.talend.sdk.component.junit.SimpleFactory.configurationByExampl
 
 @Slf4j
 @WithComponents("org.talend.components.adlsgen2")
-public class InputTestIT extends AdlsGen2TestBase {
+public class InputTestIT extends AdlsGen2IntegrationTestBase {
 
     @Test
     void readCsvWithHeader() {

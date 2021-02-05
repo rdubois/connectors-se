@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2020 Talend Inc. - www.talend.com
+ * Copyright (C) 2006-2021 Talend Inc. - www.talend.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,27 +12,17 @@
  */
 package org.talend.components.jdbc.service;
 
-import lombok.extern.slf4j.Slf4j;
-import org.talend.components.jdbc.configuration.JdbcConfiguration;
-import org.talend.components.jdbc.configuration.OutputConfig;
-import org.talend.components.jdbc.configuration.RedshiftSortStrategy;
-import org.talend.components.jdbc.dataset.TableNameDataset;
-import org.talend.components.jdbc.datastore.JdbcConnection;
-import org.talend.sdk.component.api.configuration.Option;
-import org.talend.sdk.component.api.service.Service;
-import org.talend.sdk.component.api.service.asyncvalidation.AsyncValidation;
-import org.talend.sdk.component.api.service.asyncvalidation.ValidationResult;
-import org.talend.sdk.component.api.service.completion.DynamicValues;
-import org.talend.sdk.component.api.service.completion.SuggestionValues;
-import org.talend.sdk.component.api.service.completion.Suggestions;
-import org.talend.sdk.component.api.service.completion.Values;
-import org.talend.sdk.component.api.service.configuration.Configuration;
-import org.talend.sdk.component.api.service.healthcheck.HealthCheck;
-import org.talend.sdk.component.api.service.healthcheck.HealthCheckStatus;
+import static java.util.Collections.emptyList;
+import static java.util.Comparator.comparingInt;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+import static org.talend.sdk.component.api.record.Schema.Type.RECORD;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
@@ -46,11 +36,27 @@ import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static java.util.Collections.emptyList;
-import static java.util.Comparator.comparingInt;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
+import org.talend.components.jdbc.configuration.JdbcConfiguration;
+import org.talend.components.jdbc.configuration.OutputConfig;
+import org.talend.components.jdbc.configuration.RedshiftSortStrategy;
+import org.talend.components.jdbc.dataset.TableNameDataset;
+import org.talend.components.jdbc.datastore.JdbcConnection;
+import org.talend.sdk.component.api.configuration.Option;
+import org.talend.sdk.component.api.record.Schema;
+import org.talend.sdk.component.api.service.Service;
+import org.talend.sdk.component.api.service.asyncvalidation.AsyncValidation;
+import org.talend.sdk.component.api.service.asyncvalidation.ValidationResult;
+import org.talend.sdk.component.api.service.completion.DynamicValues;
+import org.talend.sdk.component.api.service.completion.SuggestionValues;
+import org.talend.sdk.component.api.service.completion.Suggestions;
+import org.talend.sdk.component.api.service.completion.Values;
+import org.talend.sdk.component.api.service.configuration.Configuration;
+import org.talend.sdk.component.api.service.healthcheck.HealthCheck;
+import org.talend.sdk.component.api.service.healthcheck.HealthCheckStatus;
+import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
+import org.talend.sdk.component.api.service.schema.DiscoverSchema;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -72,11 +78,16 @@ public class UIActionService {
 
     public static final String ACTION_VALIDATE_SORT_KEYS = "ACTION_VALIDATE_SORT_KEYS";
 
+    private static final String ACTION_DISCOVER_SCHEMA = "ACTION_DISCOVER_SCHEMA";
+
     @Service
     private JdbcService jdbcService;
 
     @Service
     private I18nMessage i18n;
+
+    @Service
+    private RecordBuilderFactory recordBuilderFactory;
 
     @Configuration("jdbc")
     private Supplier<JdbcConfiguration> jdbcConfiguration;
@@ -114,15 +125,14 @@ public class UIActionService {
 
     @HealthCheck(ACTION_BASIC_HEALTH_CHECK)
     public HealthCheckStatus validateBasicDataStore(@Option final JdbcConnection datastore) {
-        try (JdbcService.JdbcDatasource dataSource = this.jdbcService.createDataSource(datastore)) {
-            try (final Connection ignored = dataSource.getConnection()) {
-                // no-op
-            } catch (final Exception e) {
-                return new HealthCheckStatus(HealthCheckStatus.Status.KO, e.getMessage());
-            }
-
-            return new HealthCheckStatus(HealthCheckStatus.Status.OK, i18n.successConnection());
+        try (JdbcService.JdbcDatasource dataSource = this.jdbcService.createDataSource(datastore);
+                final Connection ignored = dataSource.getConnection()) {
+            // no-op
+        } catch (final Exception e) {
+            return new HealthCheckStatus(HealthCheckStatus.Status.KO, e.getMessage());
         }
+
+        return new HealthCheckStatus(HealthCheckStatus.Status.OK, i18n.successConnection());
     }
 
     @AsyncValidation(ACTION_VALIDATION_READONLY_QUERY)
@@ -204,4 +214,22 @@ public class UIActionService {
         return new ValidationResult(ValidationResult.Status.OK, "");
     }
 
+    @DiscoverSchema(value = ACTION_DISCOVER_SCHEMA)
+    public Schema guessSchema(@Option final TableNameDataset dataset) {
+        try (JdbcService.JdbcDatasource dataSource = jdbcService.createDataSource(dataset.getConnection());
+                Connection conn = dataSource.getConnection();
+                final Statement statement = conn.createStatement()) {
+            statement.setMaxRows(1);
+            try (final ResultSet result = statement.executeQuery(dataset.getQuery())) {
+                final ResultSetMetaData meta = result.getMetaData();
+                final Schema.Builder schemaBuilder = recordBuilderFactory.newSchemaBuilder(RECORD);
+                IntStream.rangeClosed(1, meta.getColumnCount())
+                        .forEach(index -> jdbcService.addField(schemaBuilder, meta, index));
+                return schemaBuilder.build();
+            }
+        } catch (final Exception unexpected) {
+            log.error("[guessSchema]", unexpected);
+            throw new IllegalStateException(unexpected);
+        }
+    }
 }

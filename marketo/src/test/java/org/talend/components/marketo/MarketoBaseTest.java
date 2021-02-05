@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2020 Talend Inc. - www.talend.com
+ * Copyright (C) 2006-2021 Talend Inc. - www.talend.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -33,18 +33,11 @@ import org.talend.sdk.component.maven.Server;
 import lombok.Data;
 
 @Data
-@WithMavenServers
 @WithComponents("org.talend.components.marketo")
 public class MarketoBaseTest {
 
     @ClassRule
     public static final SimpleComponentRule component = new SimpleComponentRule("org.talend.components.marketo");
-
-    @DecryptedServer(value = "marketo-nocrm")
-    protected Server serverNoCrm;
-
-    @DecryptedServer(value = "marketo-nocrm-instance")
-    protected Server serverNoCrmInstance;
 
     @Injected
     protected BaseComponentsHandler handler;
@@ -55,9 +48,9 @@ public class MarketoBaseTest {
     @Service
     protected MarketoService service;
 
-    protected MarketoDataStore dataStore;
+    protected final MarketoDataStore dataStore = new MarketoDataStore();
 
-    protected MarketoDataSet dataSet;
+    protected final MarketoDataSet dataSet = new MarketoDataSet();
 
     protected MarketoInputConfiguration inputConfiguration = new MarketoInputConfiguration();
 
@@ -70,14 +63,10 @@ public class MarketoBaseTest {
 
     @BeforeEach
     protected void setUp() {
-        String endpoint = serverNoCrmInstance.getUsername();
-        String clientId = serverNoCrm.getUsername();
-        String clientSecret = serverNoCrm.getPassword();
-        dataStore = new MarketoDataStore();
-        dataStore.setEndpoint(endpoint);
-        dataStore.setClientId(clientId);
-        dataStore.setClientSecret(clientSecret);
-        dataSet = new MarketoDataSet();
+        dataStore.setEndpoint("https://marketo.com");
+        dataStore.setClientId("clientId");
+        dataStore.setClientSecret("clientSecret");
+
         dataSet.setDataStore(dataStore);
         inputConfiguration.setDataSet(dataSet);
         outputConfiguration.setDataSet(dataSet);
