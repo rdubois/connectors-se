@@ -77,7 +77,7 @@ public class CouchbaseInputTest extends CouchbaseUtilTest {
     }
 
     private void insertTestDataToDB(String idPrefix) {
-        Bucket bucket = couchbaseCluster.openBucket(BUCKET_NAME);
+        Bucket bucket = couchbaseCluster.openBucket(BUCKET_NAME, BUCKET_PASSWORD);
 
         List<JsonObject> jsonObjects = createJsonObjects();
         for (int i = 0; i < 2; i++) {
@@ -111,7 +111,7 @@ public class CouchbaseInputTest extends CouchbaseUtilTest {
     void firstValueIsNullInInputDBTest() {
         log.info("Test start: firstValueIsNullInInputDBTest");
         String idPrefix = "firstValueIsNullInInputDBTest";
-        Bucket bucket = couchbaseCluster.openBucket(BUCKET_NAME);
+        Bucket bucket = couchbaseCluster.openBucket(BUCKET_NAME, BUCKET_PASSWORD);
         JsonObject json = JsonObject.create().put("t_string1", "RRRR1").put("t_string2", "RRRR2").putNull("t_string3");
         bucket.insert(JsonDocument.create(generateDocId(idPrefix, 0), json));
         bucket.close();
@@ -157,7 +157,7 @@ public class CouchbaseInputTest extends CouchbaseUtilTest {
         String idPrefix = "inputBinaryDocumentTest";
         String docContent = "DocumentContent";
 
-        Bucket bucket = couchbaseCluster.openBucket(BUCKET_NAME);
+        Bucket bucket = couchbaseCluster.openBucket(BUCKET_NAME, BUCKET_PASSWORD);
         for (int i = 0; i < 2; i++) {
             bucket.insert(
                     createBinaryDocument(generateDocId(idPrefix, i), (docContent + "_" + i).getBytes(StandardCharsets.UTF_8)));
@@ -187,7 +187,7 @@ public class CouchbaseInputTest extends CouchbaseUtilTest {
         String idPrefix = "inputStringDocumentTest";
         String docContent = "DocumentContent";
 
-        Bucket bucket = couchbaseCluster.openBucket(BUCKET_NAME);
+        Bucket bucket = couchbaseCluster.openBucket(BUCKET_NAME, BUCKET_PASSWORD);
         for (int i = 0; i < 2; i++) {
             bucket.insert(StringDocument.create(generateDocId(idPrefix, i), (docContent + "_" + i)));
         }

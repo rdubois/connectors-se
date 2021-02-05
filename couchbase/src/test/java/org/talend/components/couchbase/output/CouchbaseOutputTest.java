@@ -22,7 +22,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import com.couchbase.client.deps.io.netty.util.ReferenceCountUtil;
@@ -63,7 +62,7 @@ public class CouchbaseOutputTest extends CouchbaseUtilTest {
     private RecordBuilderFactory recordBuilderFactory;
 
     private List<JsonDocument> retrieveDataFromDatabase(String prefix, int count) {
-        Bucket bucket = couchbaseCluster.openBucket(BUCKET_NAME, DEFAULT_TIMEOUT_IN_SEC, TimeUnit.SECONDS);
+        Bucket bucket = couchbaseCluster.openBucket(BUCKET_NAME, BUCKET_PASSWORD);
         List<JsonDocument> resultList = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             JsonDocument doc1 = bucket.get(generateDocId(prefix, i));
@@ -141,7 +140,7 @@ public class CouchbaseOutputTest extends CouchbaseUtilTest {
         configuration.setIdFieldName("id");
         executeJob(configuration);
 
-        Bucket bucket = couchbaseCluster.openBucket(BUCKET_NAME);
+        Bucket bucket = couchbaseCluster.openBucket(BUCKET_NAME, BUCKET_PASSWORD);
         List<BinaryDocument> resultList = new ArrayList<>();
         try {
             for (int i = 0; i < docCount; i++) {
@@ -251,7 +250,7 @@ public class CouchbaseOutputTest extends CouchbaseUtilTest {
         log.info("Test start: partialUpdate");
         final String PARTIAL_UPDATE_ID_PREFIX = "partialUpdate";
         // prepare data
-        Bucket bucket = couchbaseCluster.openBucket(BUCKET_NAME);
+        Bucket bucket = couchbaseCluster.openBucket(BUCKET_NAME, BUCKET_PASSWORD);
         for (int i = 0; i < 2; i++) {
             JsonObject js = new TestData().createJson(PARTIAL_UPDATE_ID_PREFIX);
             bucket.insert(JsonDocument.create(generateDocId(PARTIAL_UPDATE_ID_PREFIX, i), js));
