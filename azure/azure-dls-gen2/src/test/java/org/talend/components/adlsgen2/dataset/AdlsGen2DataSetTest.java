@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.talend.components.adlsgen2.datastore.AdlsGen2Connection;
 import org.talend.components.adlsgen2.datastore.AdlsGen2Connection.AuthMethod;
 import org.talend.components.common.formats.ParquetFormatOptions;
+import org.talend.components.common.formats.csv.CSVFormatOptions;
 import org.talend.components.common.formats.csv.CSVFormatOptionsWithSchema;
 
 class AdlsGen2DataSetTest {
@@ -40,8 +41,10 @@ class AdlsGen2DataSetTest {
         final AdlsGen2DataSet dataset = new AdlsGen2DataSet();
         dataset.setConnection(connection);
         dataset.setBlobPath("/blob/path");
-        dataset.setCsvConfiguration(new CSVFormatOptionsWithSchema());
-        dataset.getCsvConfiguration().getCsvFormatOptions().setEscapeCharacter("\\");
+        CSVFormatOptionsWithSchema csvFormatOptionsWithSchema = new CSVFormatOptionsWithSchema();
+        csvFormatOptionsWithSchema.setCsvFormatOptions(new CSVFormatOptions());
+        csvFormatOptionsWithSchema.getCsvFormatOptions().setEscapeCharacter("\\");
+        dataset.setCsvConfiguration(csvFormatOptionsWithSchema);
 
         dataset.setParquetConfiguration(new ParquetFormatOptions());
 

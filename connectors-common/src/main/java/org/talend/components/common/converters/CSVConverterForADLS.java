@@ -47,7 +47,7 @@ public class CSVConverterForADLS implements RecordConverter<CSVRecord>, Serializ
     private Map<String, Integer> runtimeHeaders;
 
     private CSVConverterForADLS(final RecordBuilderFactory factory,
-                                final @Configuration("csvConfiguration") CSVFormatOptionsWithSchema configuration) {
+            final @Configuration("csvConfiguration") CSVFormatOptionsWithSchema configuration) {
         recordBuilderFactory = factory;
         csvFormat = formatWithConfiguration(configuration);
         schema = schemaWithConfiguration(configuration);
@@ -55,7 +55,7 @@ public class CSVConverterForADLS implements RecordConverter<CSVRecord>, Serializ
     }
 
     public static CSVConverterForADLS of(final RecordBuilderFactory factory,
-                                         final @Configuration("csvConfiguration") CSVFormatOptionsWithSchema configuration) {
+            final @Configuration("csvConfiguration") CSVFormatOptionsWithSchema configuration) {
         return new CSVConverterForADLS(factory, configuration);
     }
 

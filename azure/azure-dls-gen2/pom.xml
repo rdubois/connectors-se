@@ -14,7 +14,6 @@
     <description>Azure Data Lake Storage Gen2</description>
 
     <properties>
-        <commons-csv.version>1.7.1</commons-csv.version>
         <parquet.version>1.10.1</parquet.version>
         <hadoop-common.version>3.2.1</hadoop-common.version>
         <hamcrest.version>1.3</hamcrest.version>
@@ -32,7 +31,6 @@
             <artifactId>azure-common</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.parquet</groupId>
             <artifactId>parquet-hadoop</artifactId>
