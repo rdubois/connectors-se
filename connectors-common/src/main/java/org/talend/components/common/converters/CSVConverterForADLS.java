@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.talend.components.adlsgen2.common.format.csv;
+package org.talend.components.common.converters;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -22,7 +22,6 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.csv.QuoteMode;
 import org.apache.commons.lang3.StringUtils;
-import org.talend.components.common.converters.RecordConverter;
 import org.talend.components.common.formats.csv.CSVFormatOptionsWithSchema;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.record.Schema;
@@ -34,7 +33,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class CsvConverter implements RecordConverter<CSVRecord>, Serializable {
+public class CSVConverterForADLS implements RecordConverter<CSVRecord>, Serializable {
 
     @Getter
     private CSVFormat csvFormat;
@@ -47,17 +46,17 @@ public class CsvConverter implements RecordConverter<CSVRecord>, Serializable {
     @Setter
     private Map<String, Integer> runtimeHeaders;
 
-    private CsvConverter(final RecordBuilderFactory factory,
-            final @Configuration("csvConfiguration") CSVFormatOptionsWithSchema configuration) {
+    private CSVConverterForADLS(final RecordBuilderFactory factory,
+                                final @Configuration("csvConfiguration") CSVFormatOptionsWithSchema configuration) {
         recordBuilderFactory = factory;
         csvFormat = formatWithConfiguration(configuration);
         schema = schemaWithConfiguration(configuration);
         log.debug("[CsvConverter] format: {}, schema: {}", csvFormat, schema);
     }
 
-    public static CsvConverter of(final RecordBuilderFactory factory,
-            final @Configuration("csvConfiguration") CSVFormatOptionsWithSchema configuration) {
-        return new CsvConverter(factory, configuration);
+    public static CSVConverterForADLS of(final RecordBuilderFactory factory,
+                                         final @Configuration("csvConfiguration") CSVFormatOptionsWithSchema configuration) {
+        return new CSVConverterForADLS(factory, configuration);
     }
 
     private Schema schemaWithConfiguration(CSVFormatOptionsWithSchema configuration) {

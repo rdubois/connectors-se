@@ -16,12 +16,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Iterator;
-import java.util.Map;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.talend.components.adlsgen2.common.format.csv.CsvConverter;
+import org.talend.components.common.converters.CSVConverterForADLS;
 import org.talend.components.adlsgen2.input.InputConfiguration;
 import org.talend.components.adlsgen2.runtime.AdlsGen2RuntimeException;
 import org.talend.components.adlsgen2.service.AdlsActiveDirectoryService;
@@ -58,7 +57,7 @@ public class CsvBlobReader extends BlobReader {
 
         private CSVFormat format;
 
-        private CsvConverter converter;
+        private CSVConverterForADLS converter;
 
         private String encodingValue;
 
@@ -111,7 +110,7 @@ public class CsvBlobReader extends BlobReader {
 
         private void initMetadataIfNeeded() {
             if (converter == null) {
-                converter = CsvConverter.of(getRecordBuilderFactory(), configuration.getDataSet().getCsvConfiguration());
+                converter = CSVConverterForADLS.of(getRecordBuilderFactory(), configuration.getDataSet().getCsvConfiguration());
             }
 
             if (format == null) {

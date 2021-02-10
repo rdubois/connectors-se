@@ -21,7 +21,7 @@ import java.util.List;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.StringUtils;
-import org.talend.components.adlsgen2.common.format.csv.CsvConverter;
+import org.talend.components.common.converters.CSVConverterForADLS;
 import org.talend.components.adlsgen2.output.OutputConfiguration;
 import org.talend.components.adlsgen2.runtime.AdlsGen2RuntimeException;
 import org.talend.components.common.formats.csv.CSVFormatOptionsWithSchema;
@@ -41,7 +41,7 @@ public class CsvContentFormatter extends AbstractContentFormatter {
 
     private final CSVFormat format;
 
-    private final CsvConverter converter;
+    private final CSVConverterForADLS converter;
 
     private Schema schema;
 
@@ -49,7 +49,7 @@ public class CsvContentFormatter extends AbstractContentFormatter {
             final RecordBuilderFactory recordBuilderFactory) {
         this.configuration = configuration;
         csvConfiguration = this.configuration.getDataSet().getCsvConfiguration();
-        converter = CsvConverter.of(recordBuilderFactory, csvConfiguration);
+        converter = CSVConverterForADLS.of(recordBuilderFactory, csvConfiguration);
         format = converter.getCsvFormat();
     }
 

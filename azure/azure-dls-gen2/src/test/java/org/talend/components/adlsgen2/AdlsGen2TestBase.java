@@ -22,7 +22,7 @@ import javax.json.JsonBuilderFactory;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.talend.components.adlsgen2.common.format.FileFormat;
-import org.talend.components.adlsgen2.common.format.csv.CsvConverter;
+import org.talend.components.common.converters.CSVConverterForADLS;
 import org.talend.components.adlsgen2.dataset.AdlsGen2DataSet;
 import org.talend.components.adlsgen2.datastore.AdlsGen2Connection;
 import org.talend.components.adlsgen2.datastore.AdlsGen2Connection.AuthMethod;
@@ -33,6 +33,7 @@ import org.talend.components.adlsgen2.service.AdlsActiveDirectoryService;
 import org.talend.components.adlsgen2.service.AdlsGen2Service;
 import org.talend.components.adlsgen2.service.I18n;
 import org.talend.components.common.formats.csv.CSVFieldDelimiter;
+import org.talend.components.common.formats.csv.CSVFormatOptions;
 import org.talend.components.common.formats.csv.CSVFormatOptionsWithSchema;
 import org.talend.components.common.formats.csv.CSVRecordDelimiter;
 import org.talend.sdk.component.api.record.Record;
@@ -109,6 +110,7 @@ public class AdlsGen2TestBase implements Serializable {
         // datasetRuntimeInfo = new AdlsDatasetRuntimeInfo(dataSet, tokenProviderService);
 
         CSVFormatOptionsWithSchema csvConfig = new CSVFormatOptionsWithSchema();
+        csvConfig.setCsvFormatOptions(new CSVFormatOptions());
         csvConfig.getCsvFormatOptions().setFieldDelimiter(CSVFieldDelimiter.SEMICOLON);
         csvConfig.getCsvFormatOptions().setRecordDelimiter(CSVRecordDelimiter.LF);
         csvConfig.setCsvSchema("id;firstname;lastname;address;enrolled;zip;state");
@@ -143,7 +145,7 @@ public class AdlsGen2TestBase implements Serializable {
                 .withDateTime("now", now) //
                 .withArray(ea, Arrays.asList("ary1", "ary2", "ary3")).build();
         // inject needed services
-        components.injectServices(CsvConverter.class);
+        components.injectServices(CSVConverterForADLS.class);
         I18n i18 = components.findService(I18n.class);
         recordBuilderFactory = components.findService(RecordBuilderFactory.class);
     }

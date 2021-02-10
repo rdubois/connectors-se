@@ -24,6 +24,7 @@ import java.util.Iterator;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.talend.components.adlsgen2.common.format.FileFormatRuntimeException;
+import org.talend.components.common.converters.CSVConverterForADLS;
 import org.talend.components.common.formats.csv.CSVFormatOptionsWithSchema;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.service.configuration.Configuration;
@@ -36,13 +37,13 @@ public class CsvIterator implements Iterator<Record>, Serializable {
 
     private final Reader reader;
 
-    private CsvConverter converter;
+    private CSVConverterForADLS converter;
 
     private CSVParser parser;
 
     private Iterator<CSVRecord> records;
 
-    private CsvIterator(CsvConverter converter, Reader inReader) {
+    private CsvIterator(CSVConverterForADLS converter, Reader inReader) {
         reader = inReader;
         this.converter = converter;
         try {
@@ -79,7 +80,7 @@ public class CsvIterator implements Iterator<Record>, Serializable {
 
     public static class Builder {
 
-        private CsvConverter converter;
+        private CSVConverterForADLS converter;
 
         private CSVFormatOptionsWithSchema configuration;
 
@@ -96,7 +97,7 @@ public class CsvIterator implements Iterator<Record>, Serializable {
         public Builder withConfiguration(@Configuration("csvConfiguration") final CSVFormatOptionsWithSchema configuration) {
             log.debug("[Builder::withConfiguration] conf: {}", configuration);
             this.configuration = configuration;
-            converter = CsvConverter.of(factory, configuration);
+            converter = CSVConverterForADLS.of(factory, configuration);
 
             return this;
         }
