@@ -14,7 +14,7 @@
     <name>Components :: AzureBlob</name>
 
     <properties>
-        <talend.scan.scannedDependencies>org.talend.components:azurecommon</talend.scan.scannedDependencies>
+        <talend.scan.scannedDependencies>org.talend.components:azure-common</talend.scan.scannedDependencies>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
